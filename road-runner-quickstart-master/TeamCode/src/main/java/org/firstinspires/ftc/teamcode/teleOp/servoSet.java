@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class servoSet extends LinearOpMode {
     //    public Servo    L1  = null;
 //    public Servo   L2  = null;
-    public Servo wristL = null;
-    public Servo wristR = null;
+    public Servo tiltServo2 = null;
+    public Servo tiltServo1 = null;
     public Servo intake = null;
     public static double servoPosition = 0.5;
     public static double servo2Position =0.5;
@@ -26,8 +26,9 @@ public class servoSet extends LinearOpMode {
 
 //        L1  = hardwareMap.get(Servo.class, "LIntake");
 //        L2  = hardwareMap.get(Servo.class, "RIntake");
-        heightS = hardwareMap.get(Servo.class, "clawTiltServo");
-        intake = hardwareMap.get(Servo.class,"extensionServo2");
+        tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
+        tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
+        tiltServo1.setDirection(Servo.Direction.REVERSE);
 //        wristL = hardwareMap.get(Servo.class, "wristL");
 //        wristR = hardwareMap.get(Servo.class, "wristR");
         servoPosition = 0.5;
@@ -46,18 +47,19 @@ public class servoSet extends LinearOpMode {
                 servo2Position -= 0.0003;
             }
 
-            if (gamepad1.dpad_left) {
-                servo2Position += 0.0003;
-            } else if (gamepad1.dpad_right) {
-                servo2Position -= 0.0003;
+//            if (gamepad1.dpad_left) {
+//                servo2Position += 0.0003;
+//            } else if (gamepad1.dpad_right) {
+//                servo2Position -= 0.0003;
+//            }
+//            if (gamepad1.right_bumper) {
+//                servoPosition += 0.0003;
+//            } else if (gamepad1.left_bumper) {
+//                servoPosition -= 0.0003;
             }
-            if (gamepad1.right_bumper) {
-                servoPosition += 0.0003;
-            } else if (gamepad1.left_bumper) {
-                servoPosition -= 0.0003;
-            }
-
-            heightS.setPosition(servoPosition);
+              tiltServo1.setPosition(servoPosition);
+              tiltServo2.setPosition(servo2Position);
+           // heightS.setPosition(servoPosition);
             //intake.setPosition(servo2Position);
 //            wristR.setPosition(servo2Position);
             telemetry.addData("position", servoPosition);
@@ -67,4 +69,3 @@ public class servoSet extends LinearOpMode {
         }
 
     }
-}

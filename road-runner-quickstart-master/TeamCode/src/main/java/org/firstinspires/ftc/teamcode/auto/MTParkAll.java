@@ -68,7 +68,7 @@ public class MTParkAll extends LinearOpMode {
         }
 
         telemetry.update();
-        collectionSubsystem.tilt(0.5);
+
         collectionSubsystem.retractFull();
 
 

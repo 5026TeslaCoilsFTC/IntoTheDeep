@@ -37,13 +37,13 @@ public class Drive extends OpMode {
         driveSubsystem.drive(drive, strafe, turn, 1);
 
         // === Collection Controls ===
-        if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-            collectionSubsystem.collect();
-        } else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-            collectionSubsystem.retract();
-        } else {
-            collectionSubsystem.stopCollection();
-        }
+//        if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
+//            collectionSubsystem.collect();
+//        } else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+//            collectionSubsystem.retract();
+//        } else {
+//            collectionSubsystem.stopCollection();
+//        }
 
         if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
             collectionSubsystem.extend();

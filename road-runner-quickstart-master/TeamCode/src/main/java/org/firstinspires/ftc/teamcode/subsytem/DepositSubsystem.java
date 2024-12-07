@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsytem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-
+@Config
 public class DepositSubsystem {
     private Servo tiltServo1, tiltServo2, clawTiltServo, clawServo;
     private DcMotor liftMotor1, liftMotor2;
@@ -14,38 +15,39 @@ public class DepositSubsystem {
     private PIDController slideController;
 
     // PID coefficients for slide
-    private double pSlide = 0.01, iSlide = 0.0, dSlide = 0.0;
+    private double pSlide = 0.003, iSlide = 0.0, dSlide = 0.0;
 
     // Feedforward coefficient
-    private double f = 0.1;
+    private double f = 0.0002;
 
     // Slide target position
-    private double targetSlide = 0.0;
+    public static double targetSlide = 0.0;
 
     // Servo positions for tilt and claw
     private double tiltPosition = 0.0;
     private final double MIN_TILT = 0.0;
     private final double MAX_TILT = 1.0;
-    private final double tiltClawCollect = .43;
-    private final double tiltClawPlace = .35;
-
+    private final double tiltClawCollect = .4;
+    private final double tiltClawPlace = .2;
+    public static double tiltSpec = .3;
+    public static double tiltPlace = .0;
     public DepositSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
         // Initialize hardware
         tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
         tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
-        clawTiltServo = hardwareMap.get(Servo.class, "clawTiltServo");
-        clawServo = hardwareMap.get(Servo.class, "clawServo");
+        clawTiltServo = hardwareMap.get(Servo.class, "clawServo");
+        clawServo = hardwareMap.get(Servo.class, "clawTiltServo");
         liftMotor1 = hardwareMap.get(DcMotor.class, "liftMotor1");
         liftMotor2 = hardwareMap.get(DcMotor.class, "liftMotor2");
-
+        tiltServo1.setDirection(Servo.Direction.REVERSE);
         // Reset and configure lift motors
         liftMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+        liftMotor1.setDirection(DcMotor.Direction.REVERSE);
         // Initialize PID controller
         slideController = new PIDController(pSlide, iSlide, dSlide);
     }
@@ -64,10 +66,10 @@ public class DepositSubsystem {
         tiltServo2.setPosition(tiltPosition);
     }
     public void setTiltPlace(){
-        setTilt(.6416);
+        setTilt(tiltPlace);
     }
     public void setTiltSPES(){
-        setTilt(.8);
+        setTilt(tiltSpec);
     }
 
     public void setTiltCollect2(){
@@ -77,7 +79,7 @@ public class DepositSubsystem {
         setTilt(.2);
     }
     public void setTiltCollect(){
-        setTilt(.09);
+        setTilt(.05);
     }
 
     public double getTiltPosition() {
@@ -102,11 +104,11 @@ public class DepositSubsystem {
     }
 
     public void openClaw() {
-        clawServo.setPosition(.4);
+        clawServo.setPosition(.5);
     }
-
+    public void setClaw(double poz){ clawTiltServo.setPosition(poz);}
     public void closeClaw() {
-        clawServo.setPosition(.2);
+        clawServo.setPosition(.35);
     }
     public void tiltCollect(){
         clawTiltServo.setPosition(tiltClawCollect);
