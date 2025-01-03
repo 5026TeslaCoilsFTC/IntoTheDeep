@@ -20,7 +20,7 @@ public class DriveMT extends OpMode {
     private GamepadEx gamepad1Ex, gamepad2Ex;
 
     double speed = 1;
-
+    public int collect = 0;
     @Override
     public void init() {
         // Initialize subsystems and gamepads
@@ -56,15 +56,15 @@ public class DriveMT extends OpMode {
         driveSubsystem.drive(drive, strafe, turn, speed);
 
         // === Collection Controls ===
-//        if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-//            collectionSubsystem.collect();
-//        } else if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
-//            collectionSubsystem.reverseCollection();
-//        } else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-//            collectionSubsystem.retract();
-//        } else {
-//            collectionSubsystem.stopCollection();
-//        }
+        if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
+            collectionSubsystem.collect();
+        } else if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
+            collectionSubsystem.reverseCollection();
+        } else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+            collectionSubsystem.retract();
+        } else {
+            collectionSubsystem.stopCollection();
+        }
 
         if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
             collectionSubsystem.extend();
@@ -73,17 +73,13 @@ public class DriveMT extends OpMode {
             collectionSubsystem.retractFull();
         }
 
-//        if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
-//            collectionSubsystem.tilt(0.5);
-//        }
-//
-//        if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_LEFT)) {
-//            collectionSubsystem.tilt(0.65);
-//        }
-//
-//        if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
-//            collectionSubsystem.tilt(0.35);
-//        }
+        if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
+            collectionSubsystem.tiltCollect();
+        }
+
+        else if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_LEFT)) {
+            collectionSubsystem.tiltRetract();
+        }
 
         // === Deposit Controls ===
         // Handle slide positions with D-Pad
@@ -97,46 +93,39 @@ public class DriveMT extends OpMode {
         else if(gamepad2Ex.getButton(GamepadKeys.Button.DPAD_RIGHT)){
             depositSubsystem.setTargetSlide(depositSubsystem.getTargetSlide() - 50);
         }
-//        if(gamepad2Ex.getButton(GamepadKeys.Button.DPAD_UP)){
-//            depositSubsystem.liftsUp(-1);
-//        }
-//        else if(gamepad2Ex.getButton(GamepadKeys.Button.DPAD_DOWN)){
-//            depositSubsystem.liftsDown(-1);
-//        } else if(gamepad2Ex.getButton(GamepadKeys.Button.DPAD_LEFT)){
-//            depositSubsystem.liftsUp(-.1);
-//        }
-//        else{
-//            depositSubsystem.liftsStop();
-//        }
 
         // Handle tilt and claw with A/B buttons
         if (gamepad2Ex.getButton(GamepadKeys.Button.Y)) {
             depositSubsystem.closeClaw(); // Close claw
             depositSubsystem.setTiltSPES();
-            depositSubsystem.tiltPlace();
+            collect = 2;
         }
-        else if(gamepad2Ex.getButton(GamepadKeys.Button.X)){
-            depositSubsystem.tiltPlace();
-        }
-//        else if(gamepad2Ex.getButton(GamepadKeys.Button.B)){
-//            depositSubsystem.openClaw(); // Open claw
-//        }
+
 
 
         if (gamepad2Ex.getButton(GamepadKeys.Button.A)) {
             depositSubsystem.openClaw(); // Open claw
+            depositSubsystem.setTiltSpecCollect();
+            collect  = 1;
+        }
+
+        if (gamepad2Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
             depositSubsystem.setTiltCollect();
-            depositSubsystem.tiltCollect();
+            depositSubsystem.openClaw();
+            collect = 0;
+
         }
-        if(gamepad2Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
-            depositSubsystem.setClaw(.4);
+
+        if(collectionSubsystem.getExtensionPoz()>collectionSubsystem.MIN_EXTENSION){
+            collectionSubsystem.tiltCollect();
         }
-        if(gamepad2Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
-            depositSubsystem.closeClaw();
-        }
+
+        
+
         // Update subsystems
         depositSubsystem.updateSlide();
         depositSubsystem.updateTelemetry();
         collectionSubsystem.updateTelemetry();
+        depositSubsystem.updateWrist(collect);
     }
 }

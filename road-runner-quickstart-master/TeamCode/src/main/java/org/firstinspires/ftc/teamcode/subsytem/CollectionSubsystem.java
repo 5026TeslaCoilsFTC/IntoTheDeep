@@ -9,12 +9,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class CollectionSubsystem {
     private Servo extensionServo1, extensionServo2;
-   // private CRServo collectionServo1, collectionServo2;//this sucks in samples
+    private CRServo collectionServo1, collectionServo2;//this sucks in samples
+    private Servo tiltServo1, tiltServo2;
     private Telemetry telemetry;
 
     private double extensionPosition = 0.0;
-    private final double MIN_EXTENSION = 0.4;
-    private final double MAX_EXTENSION = 0.6464;
+    public final double MIN_EXTENSION = 0.4;
+    public final double MAX_EXTENSION = 0.6464;
     private final double INCREMENT = 0.005;
 
     private final double tiltCollectPoz = 0;
@@ -26,14 +27,15 @@ public class CollectionSubsystem {
         extensionServo1 = hardwareMap.get(Servo.class, "ex" +
                 "tensionServo1");
         extensionServo2 = hardwareMap.get(Servo.class, "extensionServo2");
-//        tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
-//        tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
-//        collectionServo1 = hardwareMap.get(CRServo.class, "intake");
-//        collectionServo1.setDirection(CRServo.Direction.REVERSE);
-//        collectionServo2 = hardwareMap.get(CRServo.class, "intake2");
-//        collectionServo2.setDirection(CRServo.Direction.REVERSE);
+        tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
+        tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
+        collectionServo1 = hardwareMap.get(CRServo.class, "intake");
+        collectionServo1.setDirection(CRServo.Direction.REVERSE);
+        collectionServo2 = hardwareMap.get(CRServo.class, "intake2");
+        collectionServo2.setDirection(CRServo.Direction.REVERSE);
         extensionServo1.setPosition(MIN_EXTENSION);
         extensionServo2.setPosition(MIN_EXTENSION);
+        tiltServo1.setDirection(Servo.Direction.REVERSE);
     }
 
     public void extend() {
@@ -53,37 +55,36 @@ public class CollectionSubsystem {
         extensionServo2.setPosition(.48);
     }
 
-//    public void tilt(double position) {
-//        tiltServo1.setPosition(position);
-//        tiltServo2.setPosition(position);
-//    }
-//
-//    public void tiltCollect(){
-//        tiltServo1.setPosition(tiltCollectPoz);
-//        tiltServo2.setPosition(tiltCollectPoz);
-//    }
-//
-//    public void tiltRetract(){
-//        tiltServo1.setPosition(tiltRetractPoz);
-//        tiltServo2.setPosition(tiltRetractPoz);
-//    }
-//
-//
-//
-//    public void collect() {
-//        collectionServo1.setPower(1);
-//        collectionServo2.setPower(1);
-//    }
-//
-//    public void stopCollection() {
-//        collectionServo1.setPower(1);
-//        collectionServo2.setPower(1);
-//    }
-//
-//    public void reverseCollection() {
-//        collectionServo1.setPower(-1);
-//        collectionServo2.setPower(-1);
-//    }
+    public void tilt(double position) {
+        tiltServo1.setPosition(position);
+        tiltServo2.setPosition(position);
+    }
+
+    public void tiltCollect(){
+        tiltServo1.setPosition(tiltCollectPoz);
+        tiltServo2.setPosition(tiltCollectPoz);
+    }
+
+    public void tiltRetract(){
+        tiltServo1.setPosition(tiltRetractPoz);
+        tiltServo2.setPosition(tiltRetractPoz);
+    }
+
+
+    public void collect() {
+        collectionServo1.setPower(1);
+        collectionServo2.setPower(1);
+    }
+
+    public void stopCollection() {
+        collectionServo1.setPower(1);
+        collectionServo2.setPower(1);
+    }
+
+    public void reverseCollection() {
+        collectionServo1.setPower(-1);
+        collectionServo2.setPower(-1);
+    }
 
     public void updateTelemetry() {
         telemetry.addData("Extension Position", extensionPosition);

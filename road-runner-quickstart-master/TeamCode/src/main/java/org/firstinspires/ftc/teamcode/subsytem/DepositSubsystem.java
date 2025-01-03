@@ -11,8 +11,18 @@ public class DepositSubsystem {
     private Servo tiltServo1, tiltServo2, clawTiltServo, clawServo;
     private DcMotor liftMotor1, liftMotor2;
     private Telemetry telemetry;
-
+    private enum Lift {
+        liftUp,
+        liftDown
+    }
+    private enum ArmPoz{
+        collect,
+        collectSpec,
+        place
+    }
     private PIDController slideController;
+    Lift lift = Lift.liftUp;
+    ArmPoz armPoz = ArmPoz.collect;
 
     // PID coefficients for slide
     private double pSlide = 0.003, iSlide = 0.0, dSlide = 0.0;
@@ -27,10 +37,13 @@ public class DepositSubsystem {
     private double tiltPosition = 0.0;
     private final double MIN_TILT = 0.0;
     private final double MAX_TILT = 1.0;
-    private final double tiltClawCollect = .4;
-    private final double tiltClawPlace = .2;
+    private final double tiltClawCollectSpec = .4;
+    private final double tiltClawCollect = 0;
+    private final double tiltClawPlaceSpec = .2;
+    private final double tiltClawPlace = 0;
     public static double tiltSpec = .3;
     public static double tiltPlace = .0;
+    public final double tiltCollectPos = 0;
     public DepositSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -71,6 +84,9 @@ public class DepositSubsystem {
     public void setTiltSPES(){
         setTilt(tiltSpec);
     }
+    public void setTiltCollect(){
+        setTilt(tiltCollectPos);
+    }
 
     public void setTiltCollect2(){
         setTilt(.3860);
@@ -78,7 +94,7 @@ public class DepositSubsystem {
     public void setTiltCollect3(){
         setTilt(.2);
     }
-    public void setTiltCollect(){
+    public void setTiltSpecCollect(){
         setTilt(.05);
     }
 
@@ -110,28 +126,66 @@ public class DepositSubsystem {
     public void closeClaw() {
         clawServo.setPosition(.35);
     }
-    public void tiltCollect(){
-        clawTiltServo.setPosition(tiltClawCollect);
+    public void tiltCollectSpec(){
+        clawTiltServo.setPosition(tiltClawCollectSpec);
     }
-    public void tiltPlace(){
-        clawTiltServo.setPosition(tiltClawPlace);
+    public void tiltCollect(){clawTiltServo.setPosition(tiltClawCollect);}
+
+    public void tiltPlaceSpec(){
+        clawTiltServo.setPosition(tiltClawPlaceSpec);
     }
-    public void liftsUp(double speed){
-        liftMotor1.setPower(speed);
-        liftMotor2.setPower(-speed);
-    }
-    public void liftsDown(double speed){
-        liftMotor1.setPower(-speed);
-        liftMotor2.setPower(speed);
-    }
-    public void liftsStop(){
-        liftMotor2.setPower(0);
-        liftMotor1.setPower(0);
-    }
+    public void tiltPlace(){ clawTiltServo.setPosition(tiltClawPlace);}
+    public double getLiftPoz(){double averageliftPos =liftMotor1.getCurrentPosition()+liftMotor2.getCurrentPosition()/2; return averageliftPos;}
     public void updateTelemetry() {
         telemetry.addData("Tilt Servo 1", tiltServo1.getPosition());
         telemetry.addData("Tilt Servo 2", tiltServo2.getPosition());
         telemetry.addData("Claw Tilt Servo", clawTiltServo.getPosition());
         telemetry.addData("Claw Servo", clawServo.getPosition());
     }
+    public void updateWrist(int collect){
+        switch(lift){
+            case liftUp:
+                switch (armPoz){
+                    case collect:
+                        tiltCollect();
+                        break;
+                    case collectSpec:
+                        tiltCollectSpec();
+                        break;
+                    case place:
+                        tiltPlace();
+                        break;
+                }
+            case liftDown:
+                switch(armPoz){
+                    case collect:
+                        tiltCollect();
+                        break;
+                    case collectSpec:
+                        tiltCollectSpec();
+                        break;
+                    case place:
+                        tiltPlaceSpec();
+                        break;
+                }
+        }
+
+        if(getLiftPoz() > 50){
+            lift = Lift.liftUp;
+        }
+        else{
+            lift = Lift.liftDown;
+        }
+
+        if(collect == 0){
+            armPoz = ArmPoz.collect;
+        }
+        else if(collect == 1){
+            armPoz = ArmPoz.collectSpec;
+        }
+        else{
+            armPoz = ArmPoz.place;
+        }
+    }
+
 }
