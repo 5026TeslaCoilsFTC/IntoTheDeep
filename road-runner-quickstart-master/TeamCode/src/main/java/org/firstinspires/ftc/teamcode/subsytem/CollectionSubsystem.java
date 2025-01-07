@@ -24,15 +24,15 @@ public class CollectionSubsystem {
 
     public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        extensionServo1 = hardwareMap.get(Servo.class, "ex" +
-                "tensionServo1");
+        extensionServo1 = hardwareMap.get(Servo.class,
+                "extensionServo1");
         extensionServo2 = hardwareMap.get(Servo.class, "extensionServo2");
         tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
         tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
         collectionServo1 = hardwareMap.get(CRServo.class, "intake");
         collectionServo1.setDirection(CRServo.Direction.REVERSE);
         collectionServo2 = hardwareMap.get(CRServo.class, "intake2");
-        collectionServo2.setDirection(CRServo.Direction.REVERSE);
+
         extensionServo1.setPosition(MIN_EXTENSION);
         extensionServo2.setPosition(MIN_EXTENSION);
         tiltServo1.setDirection(Servo.Direction.REVERSE);

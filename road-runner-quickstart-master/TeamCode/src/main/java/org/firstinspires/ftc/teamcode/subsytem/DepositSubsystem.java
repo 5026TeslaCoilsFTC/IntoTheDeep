@@ -48,8 +48,8 @@ public class DepositSubsystem {
         this.telemetry = telemetry;
 
         // Initialize hardware
-        tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
-        tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
+        tiltServo1 = hardwareMap.get(Servo.class, "tiltOutServo1");
+        tiltServo2 = hardwareMap.get(Servo.class, "tiltOutServo2");
         clawTiltServo = hardwareMap.get(Servo.class, "clawServo");
         clawServo = hardwareMap.get(Servo.class, "clawTiltServo");
         liftMotor1 = hardwareMap.get(DcMotor.class, "liftMotor1");
