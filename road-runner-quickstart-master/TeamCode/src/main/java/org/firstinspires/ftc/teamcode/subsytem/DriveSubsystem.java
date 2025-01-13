@@ -17,10 +17,10 @@ public class DriveSubsystem {
         leftRear = hardwareMap.get(DcMotor.class, "bl");
         rightFront = hardwareMap.get(DcMotor.class, "fr");
         rightRear = hardwareMap.get(DcMotor.class, "br");
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        leftRear.setDirection(DcMotor.Direction.FORWARD);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
 
     }
 

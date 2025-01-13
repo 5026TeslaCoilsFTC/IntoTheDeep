@@ -19,7 +19,7 @@ public class DriveMT extends OpMode {
     private CollectionSubsystem collectionSubsystem;
     private GamepadEx gamepad1Ex, gamepad2Ex;
 
-    double speed = 1;
+    double speed = .5;
     public int collect = 0;
     @Override
     public void init() {
@@ -43,14 +43,14 @@ public class DriveMT extends OpMode {
 
         // === Speed Controls ===
         if(gamepad1Ex.getButton(GamepadKeys.Button.Y)){
-            speed = 1;
+            speed = .75;
         }
         if(gamepad1Ex.getButton(GamepadKeys.Button.X)){
             speed = 0.5;
         }
 
         // === Drive Controls ===
-        double drive = -gamepad1Ex.getLeftY(); // Forward/Backward
+        double drive = gamepad1Ex.getLeftY(); // Forward/Backward
         double strafe = gamepad1Ex.getLeftX(); // Left/Right
         double turn = gamepad1Ex.getRightX();  // Rotation
         driveSubsystem.drive(drive, strafe, turn, speed);
@@ -60,18 +60,19 @@ public class DriveMT extends OpMode {
             collectionSubsystem.collect();
         } else if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
             collectionSubsystem.reverseCollection();
-        } else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-            collectionSubsystem.retract();
-        } else {
+        }  else {
             collectionSubsystem.stopCollection();
         }
 
-        if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-            collectionSubsystem.extend();
-        }
-        else if(gamepad1Ex.getButton(GamepadKeys.Button.A)){
-            collectionSubsystem.retractFull();
-        }
+ //     if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+ //           collectionSubsystem.extend();
+ //       }
+ //       else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+ //           collectionSubsystem.retract();}
+ //       else if(gamepad1Ex.getButton(GamepadKeys.Button.A)){
+ //           collectionSubsystem.retractFull();
+ //       }
+
 
         if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
             collectionSubsystem.tiltCollect();
@@ -84,7 +85,7 @@ public class DriveMT extends OpMode {
         // === Deposit Controls ===
         // Handle slide positions with D-Pad
         if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
-            depositSubsystem.setTargetSlide(1000); // Top position (adjust value based on your setup)
+            depositSubsystem.setTargetSlide(3300); // Top position (adjust value based on your setup)
         } else if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_DOWN)) {
             depositSubsystem.setTargetSlide(0); // Zero position
         } else if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_LEFT)) {
@@ -93,11 +94,14 @@ public class DriveMT extends OpMode {
         else if(gamepad2Ex.getButton(GamepadKeys.Button.DPAD_RIGHT)){
             depositSubsystem.setTargetSlide(depositSubsystem.getTargetSlide() - 50);
         }
-
+        else if(gamepad2Ex.getButton(GamepadKeys.Button.START)){
+            depositSubsystem.resetLifts();
+        }
         // Handle tilt and claw with A/B buttons
         if (gamepad2Ex.getButton(GamepadKeys.Button.Y)) {
             depositSubsystem.closeClaw(); // Close claw
-            depositSubsystem.setTiltSPES();
+            depositSubsystem.setTiltPlace();
+            depositSubsystem.tiltPlacespec();
             collect = 2;
         }
 
@@ -106,11 +110,13 @@ public class DriveMT extends OpMode {
         if (gamepad2Ex.getButton(GamepadKeys.Button.A)) {
             depositSubsystem.openClaw(); // Open claw
             depositSubsystem.setTiltSpecCollect();
+            depositSubsystem.tiltPlace();
             collect  = 1;
         }
 
         if (gamepad2Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
             depositSubsystem.setTiltCollect();
+            depositSubsystem.tiltPlacec();
             depositSubsystem.openClaw();
             collect = 0;
 
@@ -119,6 +125,16 @@ public class DriveMT extends OpMode {
         if(collectionSubsystem.getExtensionPoz()>collectionSubsystem.MIN_EXTENSION){
             collectionSubsystem.tiltCollect();
         }
+        if(gamepad2Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
+            depositSubsystem.tiltPlaceSpec();
+        }
+
+        if(gamepad2Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)> .1){
+            depositSubsystem.openClaw();
+        }
+        else if(gamepad2Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)> .1) {
+            depositSubsystem.closeClaw();
+        }
 
 
 
@@ -126,6 +142,6 @@ public class DriveMT extends OpMode {
         depositSubsystem.updateSlide();
         depositSubsystem.updateTelemetry();
         collectionSubsystem.updateTelemetry();
-        depositSubsystem.updateWrist(collect);
+
     }
 }

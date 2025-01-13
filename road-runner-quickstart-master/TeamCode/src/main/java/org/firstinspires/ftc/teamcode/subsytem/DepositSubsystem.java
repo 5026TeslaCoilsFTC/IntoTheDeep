@@ -37,13 +37,14 @@ public class DepositSubsystem {
     private double tiltPosition = 0.0;
     private final double MIN_TILT = 0.0;
     private final double MAX_TILT = 1.0;
-    private final double tiltClawCollectSpec = .4;
-    private final double tiltClawCollect = 0;
-    private final double tiltClawPlaceSpec = .2;
-    private final double tiltClawPlace = 0;
-    public static double tiltSpec = .3;
-    public static double tiltPlace = .0;
-    public final double tiltCollectPos = 0;
+    private final double tiltClawCollectSpec = .0;
+    private final double tiltClawCollect = 0.8;
+    private final double tiltClawPlaceSpec = .55;
+    private final double tiltClawPlace = 0.71;
+    public static double tiltSpec = .087;
+    public static double tiltPlace = .7;
+    public final double tiltCollectSpecPos = 1;
+    public final double tiltCollectPos = .04;
     public DepositSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -95,7 +96,7 @@ public class DepositSubsystem {
         setTilt(.2);
     }
     public void setTiltSpecCollect(){
-        setTilt(.05);
+        setTilt(tiltCollectSpecPos);
     }
 
     public double getTiltPosition() {
@@ -120,11 +121,11 @@ public class DepositSubsystem {
     }
 
     public void openClaw() {
-        clawServo.setPosition(.5);
+        clawServo.setPosition(.15);
     }
     public void setClaw(double poz){ clawTiltServo.setPosition(poz);}
     public void closeClaw() {
-        clawServo.setPosition(.35);
+        clawServo.setPosition(0);
     }
     public void tiltCollectSpec(){
         clawTiltServo.setPosition(tiltClawCollectSpec);
@@ -135,12 +136,21 @@ public class DepositSubsystem {
         clawTiltServo.setPosition(tiltClawPlaceSpec);
     }
     public void tiltPlace(){ clawTiltServo.setPosition(tiltClawPlace);}
+    public void tiltPlacec(){clawTiltServo.setPosition(tiltClawPlace+.14);}
+    public void tiltPlacespec(){clawTiltServo.setPosition(tiltClawPlace+.1);}
     public double getLiftPoz(){double averageliftPos =liftMotor1.getCurrentPosition()+liftMotor2.getCurrentPosition()/2; return averageliftPos;}
     public void updateTelemetry() {
         telemetry.addData("Tilt Servo 1", tiltServo1.getPosition());
         telemetry.addData("Tilt Servo 2", tiltServo2.getPosition());
         telemetry.addData("Claw Tilt Servo", clawTiltServo.getPosition());
         telemetry.addData("Claw Servo", clawServo.getPosition());
+
+    }
+    public void resetLifts(){
+        liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void updateWrist(int collect){
         switch(lift){
@@ -186,6 +196,9 @@ public class DepositSubsystem {
         else{
             armPoz = ArmPoz.place;
         }
+        telemetry.addData("Collect Number", collect);
+
+
     }
 
 }

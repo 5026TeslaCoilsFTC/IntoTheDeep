@@ -18,9 +18,9 @@ public class CollectionSubsystem {
     public final double MAX_EXTENSION = 0.6464;
     private final double INCREMENT = 0.005;
 
-    private final double tiltCollectPoz = 0;
+    private final double tiltCollectPoz = .8;
 
-    private final double tiltRetractPoz = 1;
+    private final double tiltRetractPoz = .2;
 
     public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -57,17 +57,17 @@ public class CollectionSubsystem {
 
     public void tilt(double position) {
         tiltServo1.setPosition(position);
-        tiltServo2.setPosition(position);
+        //tiltServo2.setPosition(position);
     }
 
     public void tiltCollect(){
         tiltServo1.setPosition(tiltCollectPoz);
-        tiltServo2.setPosition(tiltCollectPoz);
+        //tiltServo2.setPosition(tiltCollectPoz);
     }
 
     public void tiltRetract(){
         tiltServo1.setPosition(tiltRetractPoz);
-        tiltServo2.setPosition(tiltRetractPoz);
+        //tiltServo2.setPosition(tiltRetractPoz);
     }
 
 
@@ -77,8 +77,8 @@ public class CollectionSubsystem {
     }
 
     public void stopCollection() {
-        collectionServo1.setPower(1);
-        collectionServo2.setPower(1);
+        collectionServo1.setPower(0);
+        collectionServo2.setPower(0);
     }
 
     public void reverseCollection() {
@@ -88,8 +88,8 @@ public class CollectionSubsystem {
 
     public void updateTelemetry() {
         telemetry.addData("Extension Position", extensionPosition);
-//        telemetry.addData("Tilt Servo", tiltServo1.getPosition());
-//        telemetry.addData("Tilt Servo", tiltServo2.getPosition());
+        telemetry.addData("Tilt Servo", tiltServo1.getPosition());
+       telemetry.addData("Tilt Servo", tiltServo2.getPosition());
     }
 
     public void extendToPoz(double pos1, double pos2) {
