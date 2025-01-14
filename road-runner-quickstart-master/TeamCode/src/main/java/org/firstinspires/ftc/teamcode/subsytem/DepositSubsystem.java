@@ -8,8 +8,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 @Config
 public class DepositSubsystem {
-    private Servo tiltServo1, tiltServo2, clawTiltServo, clawServo;
-    private DcMotor liftMotor1, liftMotor2;
+    public Servo tiltServo1, tiltServo2, clawTiltServo, clawServo;
+    public DcMotor liftMotor1, liftMotor2;
     private Telemetry telemetry;
     private enum Lift {
         liftUp,
