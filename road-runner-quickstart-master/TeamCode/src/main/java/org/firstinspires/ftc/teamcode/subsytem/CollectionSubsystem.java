@@ -51,8 +51,8 @@ public class CollectionSubsystem {
     }
 
     public void retractFull() {
-        extensionServo1.setPosition(.47);
-        extensionServo2.setPosition(.48);
+        extensionServo1.setPosition(0);
+        extensionServo2.setPosition(0);
     }
 
     public void tilt(double position) {

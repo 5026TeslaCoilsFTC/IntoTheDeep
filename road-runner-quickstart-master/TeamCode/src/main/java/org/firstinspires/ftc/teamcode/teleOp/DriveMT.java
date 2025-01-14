@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 
 import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
@@ -18,7 +19,8 @@ public class DriveMT extends OpMode {
     private DriveSubsystem driveSubsystem;
     private CollectionSubsystem collectionSubsystem;
     private GamepadEx gamepad1Ex, gamepad2Ex;
-
+    public AnalogInput extensionServo;
+   //ublic AnalogInput extensionServo;
     double speed = .5;
     public int collect = 0;
     @Override
@@ -30,7 +32,7 @@ public class DriveMT extends OpMode {
 
         gamepad1Ex = new GamepadEx(gamepad1);
         gamepad2Ex = new GamepadEx(gamepad2);
-
+        extensionServo = hardwareMap.get(AnalogInput.class, "extensionServo");
 
         //INITIAL START POSITIONS//
         driveSubsystem.drive(0,0,0, 0);
@@ -64,14 +66,14 @@ public class DriveMT extends OpMode {
             collectionSubsystem.stopCollection();
         }
 
- //     if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
- //           collectionSubsystem.extend();
- //       }
- //       else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
- //           collectionSubsystem.retract();}
- //       else if(gamepad1Ex.getButton(GamepadKeys.Button.A)){
- //           collectionSubsystem.retractFull();
- //       }
+      if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+            collectionSubsystem.extend();
+        }
+        else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+            collectionSubsystem.retract();}
+        else if(gamepad1Ex.getButton(GamepadKeys.Button.A)){
+            collectionSubsystem.retractFull();
+        }
 
 
         if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
@@ -141,6 +143,7 @@ public class DriveMT extends OpMode {
         // Update subsystems
         depositSubsystem.updateSlide();
         depositSubsystem.updateTelemetry();
+        telemetry.addData("Extension Servo", extensionServo);
         collectionSubsystem.updateTelemetry();
 
     }
