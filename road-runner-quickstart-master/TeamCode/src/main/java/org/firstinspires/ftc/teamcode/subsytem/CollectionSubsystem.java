@@ -14,8 +14,8 @@ public class CollectionSubsystem {
     private Telemetry telemetry;
 
     private double extensionPosition = 0.0;
-    public final double MIN_EXTENSION = 0.4;
-    public final double MAX_EXTENSION = 0.6464;
+    public final double MIN_EXTENSION = 0;
+    public final double MAX_EXTENSION = 1;
     private final double INCREMENT = 0.005;
 
     private final double tiltCollectPoz = .8;
@@ -40,8 +40,8 @@ public class CollectionSubsystem {
 
     public void extend() {
         extensionPosition = Math.min(extensionPosition + INCREMENT, MAX_EXTENSION);
-        extensionServo1.setPosition(extensionPosition);
-        extensionServo2.setPosition(extensionPosition);
+        extensionServo1.setPosition(1);
+        extensionServo2.setPosition(1);
     }
 
     public void retract() {

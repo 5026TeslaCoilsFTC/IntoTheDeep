@@ -26,8 +26,8 @@ import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 @Config
-@Autonomous(name ="specSideAuto2Spec", group = "Autonomous")
-public class specSideAuto extends LinearOpMode{
+@Autonomous(name ="Basket Side Auto", group = "Autonomous")
+public class basketSideAuto extends LinearOpMode{
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
     private CollectionSubsystem collectionSubsystem;
@@ -57,25 +57,7 @@ public class specSideAuto extends LinearOpMode{
                 .splineToLinearHeading(new Pose2d(10, -32, Math.toRadians(-90)), Math.toRadians(90));
         Action preloadSpec;
         preloadSpec = preloadspecPlace.build();
-        TrajectoryActionBuilder collectSpec = drive.actionBuilder(drive.pose)
 
-                .setTangent(Math.toRadians(0))
-
-                .splineToLinearHeading(new Pose2d(42, -40, Math.toRadians(90)), Math.toRadians(-90))
-                .setTangent(Math.toRadians(0))
-
-                .splineToLinearHeading(new Pose2d(42, -50.5, Math.toRadians(90)), Math.toRadians(-90));
-
-        Action CollectSpec;
-        CollectSpec = collectSpec.build();
-        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(drive.pose)
-                .waitSeconds(.4)
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(10, -40, Math.toRadians(-55)), Math.toRadians(90))
-        .splineToLinearHeading(new Pose2d(10, -31, Math.toRadians(-90)), Math.toRadians(90));
-        Action SpecPlace1;
-//        Action closeClaw = depositSubsystem.closeClaw();
-        SpecPlace1 = specPlace1.build();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
         depositSubsystem.setTiltPlace();
@@ -85,61 +67,22 @@ public class specSideAuto extends LinearOpMode{
             depositSubsystem.updateSlide();
             switch (stage) {
                 case preloadM:
-                Actions.runBlocking(
-                        new SequentialAction(
-                                preloadSpec
+                    Actions.runBlocking(
+                            new SequentialAction(
+                                    preloadSpec
 
-                        )
+                            )
 
 
-                );
+                    );
 
                     depositSubsystem.openClaw();
-                    depositSubsystem.setTiltSpecCollect();
+                    depositSubsystem.setTiltCollect();
                     depositSubsystem.tiltPlace();// Open claw
                     stage = Stage.collect1M;
-
                     break;
-                case collect1M:
-                Actions.runBlocking(
-                        new SequentialAction(
-                                CollectSpec
-
-                        )
 
 
-                );
-                depositSubsystem.openClaw(); // Open claw
-                depositSubsystem.setTiltSpecCollect();
-                depositSubsystem.tiltPlace();
-
-                    clawClose.reset();
-                    stage = Stage.collect1S;
-
-                break;
-                case collect1S:
-                    if(clawClose.seconds() > .4){
-                        depositSubsystem.closeClaw();
-                    }
-                    if(clawClose.seconds()> .8){
-                        depositSubsystem.setTiltPlace();
-                        depositSubsystem.tiltPlacespec();
-                        stage = Stage.place1M;
-                    }
-                    break;
-                case place1M:
-                Actions.runBlocking(
-                        new SequentialAction(
-                                SpecPlace1
-
-                        )
-
-
-                );
-
-                    stage = Stage.idle;
-
-                break;
                 case idle:
 
                     break;
