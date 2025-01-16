@@ -34,6 +34,7 @@ public class specSideAutoCycles extends LinearOpMode{
     private enum Stage{
         preloadM,
         pushIntoZone,
+        collectZone1,
         collect1M,
         collect1S,
         place1M,
@@ -57,25 +58,32 @@ public class specSideAutoCycles extends LinearOpMode{
         Action preloadSpec;
         preloadSpec = preloadspecPlace.build();
         TrajectoryActionBuilder pushZone = drive.actionBuilder(drive.pose)
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(10, -40, Math.toRadians(-90)), Math.toRadians(0))
                 .setTangent(Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(48, -45, Math.toRadians(90)), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(49, -36.5, Math.toRadians(90)), Math.toRadians(0))
 
-                .waitSeconds(.2);
+                .waitSeconds(.4);
         Action PushZone;
         PushZone = pushZone.build();
+        TrajectoryActionBuilder pushZoneC = drive.actionBuilder(drive.pose)
+                .setTangent(Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(50, -45), Math.toRadians(90))
+                ;
+        Action PushZoneC;
+        PushZoneC = pushZoneC.build();
         TrajectoryActionBuilder collectSpec = drive.actionBuilder(drive.pose)
 
 
-                .setTangent(Math.toRadians(0))
+                .setTangent(Math.toRadians(90))
 
-                .splineToLinearHeading(new Pose2d(42, -50.5, Math.toRadians(90)), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(42, -50.5), Math.toRadians(90));
 
         Action CollectSpec;
         CollectSpec = collectSpec.build();
         TrajectoryActionBuilder specPlace1 = drive.actionBuilder(drive.pose)
                 .waitSeconds(.4)
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(10, -40, Math.toRadians(-55)), Math.toRadians(90))
                 .splineToLinearHeading(new Pose2d(10, -31, Math.toRadians(-90)), Math.toRadians(90));
         Action SpecPlace1;
 //        Action closeClaw = depositSubsystem.closeClaw();
@@ -104,6 +112,9 @@ public class specSideAutoCycles extends LinearOpMode{
 
                     break;
                 case pushIntoZone:
+                    //collectionSubsystem.extend();
+                    collectionSubsystem.tiltRetract();
+                    collectionSubsystem.collect();
                     Actions.runBlocking(
                             new SequentialAction(
                                     PushZone
@@ -112,29 +123,49 @@ public class specSideAutoCycles extends LinearOpMode{
 
 
                     );
-                    collectionSubsystem.extend();
-                    collectionSubsystem.tiltCollect();
-                    collectionSubsystem.collect();
 
-                    stage = Stage.idle;
+                    collect.reset();
+                    clawClose.reset();
+                    stage = Stage.collectZone1;
                     break;
 
+                case collectZone1:
+                    if(collect.seconds()<.5){
+                       collectionSubsystem.stopCollection();
+                       collectionSubsystem.tiltCollect();
+                      // collectionSubsystem.retractFull();
+                    }
+                    else if(collect.seconds()>.5 && collect.seconds()<.75){
+                        collectionSubsystem.reverseCollection();
+                        depositSubsystem.setTiltCollect();
+                        depositSubsystem.tiltPlacec();
+                        depositSubsystem.openClaw();
+
+                    }
+                    if(collect.seconds() >1.5){
+                        collectionSubsystem.stopCollection();
+                        depositSubsystem.closeClaw();
+                    }
+                    if(collect.seconds()>2&& collect.seconds()<2.25){
+
+                        depositSubsystem.setTiltSpecCollect();
+
+                    }
+                    else if(collect.seconds()>3.25 && collect.seconds()<3.5){
+                        depositSubsystem.tiltPlace();
+
+
+                        stage = Stage.collect1M;
+                }
+                    break;
                 case collect1M:
-                    depositSubsystem.openClaw();
-                    depositSubsystem.setTiltSpecCollect();
-                    depositSubsystem.tiltPlace();
                     Actions.runBlocking(
-                            new SequentialAction(
-                                    CollectSpec
-
-                            )
-
-
+                            PushZoneC
                     );
-                    depositSubsystem.openClaw(); // Open claw
-                    depositSubsystem.setTiltSpecCollect();
-                    depositSubsystem.tiltPlace();
-
+                    depositSubsystem.openClaw();
+                    Actions.runBlocking(
+                            CollectSpec
+                    );
                     clawClose.reset();
                     stage = Stage.collect1S;
 

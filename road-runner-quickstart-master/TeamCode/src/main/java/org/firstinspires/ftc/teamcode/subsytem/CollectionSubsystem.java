@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class CollectionSubsystem {
-    private Servo extensionServo1, extensionServo2;
+    private CRServo extensionServo1, extensionServo2;
     private CRServo collectionServo1, collectionServo2;//this sucks in samples
     private Servo tiltServo1, tiltServo2;
     private Telemetry telemetry;
@@ -24,36 +24,42 @@ public class CollectionSubsystem {
 
     public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        extensionServo1 = hardwareMap.get(Servo.class,
+        extensionServo1 = hardwareMap.get(CRServo.class,
                 "extensionServo1");
-        extensionServo2 = hardwareMap.get(Servo.class, "extensionServo2");
+        extensionServo2 = hardwareMap.get(CRServo.class, "extensionServo2");
         tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
         tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
         collectionServo1 = hardwareMap.get(CRServo.class, "intake");
         collectionServo1.setDirection(CRServo.Direction.REVERSE);
         collectionServo2 = hardwareMap.get(CRServo.class, "intake2");
 
-        extensionServo1.setPosition(MIN_EXTENSION);
-        extensionServo2.setPosition(MIN_EXTENSION);
         tiltServo1.setDirection(Servo.Direction.REVERSE);
     }
 
-    public void extend() {
-        extensionPosition = Math.min(extensionPosition + INCREMENT, MAX_EXTENSION);
-        extensionServo1.setPosition(1);
-        extensionServo2.setPosition(1);
+    public void CRExtend(){
+        extensionServo1.setPower(1);
     }
 
-    public void retract() {
-        extensionPosition = Math.max(extensionPosition - INCREMENT, MIN_EXTENSION);
-        extensionServo1.setPosition(extensionPosition);
-        extensionServo2.setPosition(extensionPosition);
+    public void CRRetract(){
+        extensionServo1.setPower(-1);
     }
-
-    public void retractFull() {
-        extensionServo1.setPosition(0);
-        extensionServo2.setPosition(0);
-    }
+    public void Stop(){extensionServo1.setPower(0);}
+//    public void extend() {
+//        extensionPosition = Math.min(extensionPosition + INCREMENT, MAX_EXTENSION);
+//        extensionServo1.setPosition(1);
+//        extensionServo2.setPosition(1);
+//    }
+//
+//    public void retract() {
+//        extensionPosition = Math.max(extensionPosition - INCREMENT, MIN_EXTENSION);
+//        extensionServo1.setPosition(extensionPosition);
+//        extensionServo2.setPosition(extensionPosition);
+//    }
+//
+//    public void retractFull() {
+//        extensionServo1.setPosition(0);
+//        extensionServo2.setPosition(0);
+//    }
 
     public void tilt(double position) {
         tiltServo1.setPosition(position);
@@ -72,8 +78,8 @@ public class CollectionSubsystem {
 
 
     public void collect() {
-        collectionServo1.setPower(1);
-        collectionServo2.setPower(1);
+        collectionServo1.setPower(-1);
+        collectionServo2.setPower(-1);
     }
 
     public void stopCollection() {
@@ -82,8 +88,8 @@ public class CollectionSubsystem {
     }
 
     public void reverseCollection() {
-        collectionServo1.setPower(-1);
-        collectionServo2.setPower(-1);
+        collectionServo1.setPower(.2);
+        collectionServo2.setPower(.2);
     }
 
     public void updateTelemetry() {
@@ -91,11 +97,11 @@ public class CollectionSubsystem {
         telemetry.addData("Tilt Servo", tiltServo1.getPosition());
        telemetry.addData("Tilt Servo", tiltServo2.getPosition());
     }
-
-    public void extendToPoz(double pos1, double pos2) {
-        extensionServo1.setPosition(pos1);
-        extensionServo2.setPosition(pos2);
-    }
+//
+//    public void extendToPoz(double pos1, double pos2) {
+//        extensionServo1.setPosition(pos1);
+//        extensionServo2.setPosition(pos2);
+//    }
 
     public double getExtensionPoz() {
         return extensionPosition;

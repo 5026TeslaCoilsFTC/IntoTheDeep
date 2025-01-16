@@ -25,23 +25,23 @@ public class DriveSubsystem {
     }
 
     public void drive(double yInput, double lxInput, double rxInput, double speed) {
-//        double y = yInput * speed; // Remember, this is reversed!
-//        double lx = lxInput * speed; // Counteract imperfect strafing
-//        double rx = rxInput * speed;
-//
-//        double denominator = Math.max(Math.abs(y) + Math.abs(lx) + Math.abs(rx), 1);
-//        double frontLeftPower = (y + lx + rx) / denominator;
-//        double backLeftPower = (y - lx + rx) / denominator;
-//        double frontRightPower = (y - lx - rx) / denominator;
-//        double backRightPower = (y + lx - rx) / denominator;
-//
-//        leftFront.setPower(frontLeftPower);
-//        leftRear.setPower(backLeftPower);
-//        rightFront.setPower(frontRightPower);
-//        rightRear.setPower(backRightPower);
-//
-//        telemetry.addData("Drive", "LF: %.2f, LR: %.2f, RF: %.2f, RR: %.2f",
-//                frontLeftPower, backLeftPower, frontRightPower, backRightPower);
+        double y = yInput * speed; // Remember, this is reversed!
+        double lx = lxInput * speed; // Counteract imperfect strafing
+        double rx = rxInput * speed;
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(lx) + Math.abs(rx), 1);
+        double frontLeftPower = (y + lx + rx) / denominator;
+        double backLeftPower = (y - lx + rx) / denominator;
+        double frontRightPower = (y - lx - rx) / denominator;
+        double backRightPower = (y + lx - rx) / denominator;
+
+        leftFront.setPower(frontLeftPower);
+        leftRear.setPower(backLeftPower);
+        rightFront.setPower(frontRightPower);
+        rightRear.setPower(backRightPower);
+
+        telemetry.addData("Drive", "LF: %.2f, LR: %.2f, RF: %.2f, RR: %.2f",
+                frontLeftPower, backLeftPower, frontRightPower, backRightPower);
         
     }
 

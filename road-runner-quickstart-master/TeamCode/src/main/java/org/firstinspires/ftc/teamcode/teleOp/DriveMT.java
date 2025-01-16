@@ -37,7 +37,7 @@ public class DriveMT extends OpMode {
         //INITIAL START POSITIONS//
         driveSubsystem.drive(0,0,0, 0);
         //collectionSubsystem.tilt(0.5);
-        collectionSubsystem.retractFull();
+
     }
 
     @Override
@@ -67,13 +67,15 @@ public class DriveMT extends OpMode {
         }
 
       if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-            collectionSubsystem.extend();
+            collectionSubsystem.CRRetract();
         }
-        else if (gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-            collectionSubsystem.retract();}
+
         else if(gamepad1Ex.getButton(GamepadKeys.Button.A)){
-            collectionSubsystem.retractFull();
+            collectionSubsystem.CRExtend();
         }
+        else{
+            collectionSubsystem.Stop();
+      }
 
 
         if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
@@ -124,9 +126,7 @@ public class DriveMT extends OpMode {
 
         }
 
-        if(collectionSubsystem.getExtensionPoz()>collectionSubsystem.MIN_EXTENSION){
-            collectionSubsystem.tiltCollect();
-        }
+
         if(gamepad2Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
             depositSubsystem.tiltPlaceSpec();
         }

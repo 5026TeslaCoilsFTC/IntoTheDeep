@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsytem;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -42,9 +43,9 @@ public class DepositSubsystem {
     private final double tiltClawPlaceSpec = .55;
     private final double tiltClawPlace = 0.71;
     public static double tiltSpec = .087;
-    public static double tiltPlace = .7;
+    public static double tiltPlace = .72;
     public final double tiltCollectSpecPos = 1;
-    public final double tiltCollectPos = .04;
+    public final double tiltCollectPos = .06;
     public DepositSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -136,15 +137,27 @@ public class DepositSubsystem {
         clawTiltServo.setPosition(tiltClawPlaceSpec);
     }
     public void tiltPlace(){ clawTiltServo.setPosition(tiltClawPlace);}
-    public void tiltPlacec(){clawTiltServo.setPosition(tiltClawPlace+.14);}
+    public void tiltPlacec(){clawTiltServo.setPosition(tiltClawPlace+.18);}
     public void tiltPlacespec(){clawTiltServo.setPosition(tiltClawPlace+.1);}
     public double getLiftPoz(){double averageliftPos =liftMotor1.getCurrentPosition()+liftMotor2.getCurrentPosition()/2; return averageliftPos;}
     public void updateTelemetry() {
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
         telemetry.addData("Tilt Servo 1", tiltServo1.getPosition());
         telemetry.addData("Tilt Servo 2", tiltServo2.getPosition());
         telemetry.addData("Claw Tilt Servo", clawTiltServo.getPosition());
         telemetry.addData("Claw Servo", clawServo.getPosition());
-
+        telemetry.addData("Lift Target", targetSlide);
+        telemetry.addData("Lift Positions", liftMotor1.getCurrentPosition());
+        telemetry.addData("Lift Error", targetSlide-liftMotor2.getCurrentPosition());
+        double liftErrorPercent = targetSlide-(liftMotor2.getCurrentPosition());
+        liftErrorPercent /= targetSlide;
+        dashboardTelemetry.addData("Lift Error Percentage", liftErrorPercent);
+        dashboardTelemetry.addData("Lift Target", targetSlide);
+        dashboardTelemetry.addData("Lift Positions", liftMotor2.getCurrentPosition());
+        dashboardTelemetry.addData("Lift Error", targetSlide-liftMotor2.getCurrentPosition());
+        dashboardTelemetry.addData("Lift Error Percentage", liftErrorPercent);
+        dashboardTelemetry.update();
     }
     public void resetLifts(){
         liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
