@@ -18,9 +18,9 @@ public class CollectionSubsystem {
     public final double MAX_EXTENSION = 1;
     private final double INCREMENT = 0.005;
 
-    private final double tiltCollectPoz = .8;
+    private final double tiltCollectPoz = .82;
 
-    private final double tiltRetractPoz = .2;
+    private final double tiltRetractPoz = .23;
 
     public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -88,8 +88,8 @@ public class CollectionSubsystem {
     }
 
     public void reverseCollection() {
-        collectionServo1.setPower(.2);
-        collectionServo2.setPower(.2);
+        collectionServo1.setPower(.15);
+        collectionServo2.setPower(.15);
     }
 
     public void updateTelemetry() {

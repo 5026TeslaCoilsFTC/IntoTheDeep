@@ -39,13 +39,13 @@ public class DepositSubsystem {
     private final double MIN_TILT = 0.0;
     private final double MAX_TILT = 1.0;
     private final double tiltClawCollectSpec = .0;
-    private final double tiltClawCollect = 0.8;
+    private final double tiltClawCollect = 0.79;
     private final double tiltClawPlaceSpec = .55;
     private final double tiltClawPlace = 0.71;
     public static double tiltSpec = .087;
-    public static double tiltPlace = .72;
-    public final double tiltCollectSpecPos = 1;
-    public final double tiltCollectPos = .06;
+    public static double tiltPlace = .65;
+    public final double tiltCollectSpecPos = .85;
+    public final double tiltCollectPos = .035;
     public DepositSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -137,7 +137,7 @@ public class DepositSubsystem {
         clawTiltServo.setPosition(tiltClawPlaceSpec);
     }
     public void tiltPlace(){ clawTiltServo.setPosition(tiltClawPlace);}
-    public void tiltPlacec(){clawTiltServo.setPosition(tiltClawPlace+.18);}
+    public void tiltPlacec(){clawTiltServo.setPosition(tiltClawPlace+.16);}
     public void tiltPlacespec(){clawTiltServo.setPosition(tiltClawPlace+.1);}
     public double getLiftPoz(){double averageliftPos =liftMotor1.getCurrentPosition()+liftMotor2.getCurrentPosition()/2; return averageliftPos;}
     public void updateTelemetry() {

@@ -15,19 +15,17 @@ public class basketSideAuto {
 
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-15, -61, Math.toRadians(-90)))
-                .waitSeconds(.8)
-                .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-15, -32, Math.toRadians(-90)), Math.toRadians(90))
-                .waitSeconds(.8)
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-30, -61, Math.toRadians(-90)))
+                        .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-66,-42,Math.toRadians(45)),Math.toRadians(135))
+                .setTangent(Math.toRadians(70))
+                .splineToLinearHeading(new Pose2d(-56,-32,Math.toRadians(110)),Math.toRadians(70))
+                        .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-66,-42,Math.toRadians(45)),Math.toRadians(135))
+                        .setTangent(Math.toRadians(70))
+                        .splineToLinearHeading(new Pose2d(-59, -32, Math.toRadians(110)),Math.toRadians(70))
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(-10,-50,Math.toRadians(-90)),Math.toRadians(-90))
-                .waitSeconds(.8)
-                .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-49,-32,Math.toRadians(110)),Math.toRadians(180))
-                .waitSeconds(.8)
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(-58,-56,Math.toRadians(45)),Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-66,-42,Math.toRadians(45)),Math.toRadians(135))
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)

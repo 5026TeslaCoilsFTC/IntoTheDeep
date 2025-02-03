@@ -70,7 +70,7 @@ public class DriveMT extends OpMode {
             collectionSubsystem.CRRetract();
         }
 
-        else if(gamepad1Ex.getButton(GamepadKeys.Button.A)){
+        else if(gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
             collectionSubsystem.CRExtend();
         }
         else{
@@ -78,21 +78,21 @@ public class DriveMT extends OpMode {
       }
 
 
-        if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
+        if (gamepad2Ex.getButton(GamepadKeys.Button.B)) {
             collectionSubsystem.tiltCollect();
         }
 
-        else if (gamepad1Ex.getButton(GamepadKeys.Button.DPAD_LEFT)) {
+        else if (gamepad2Ex.getButton(GamepadKeys.Button.X)) {
             collectionSubsystem.tiltRetract();
         }
 
         // === Deposit Controls ===
         // Handle slide positions with D-Pad
         if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
-            depositSubsystem.setTargetSlide(3300); // Top position (adjust value based on your setup)
+            depositSubsystem.setTargetSlide(3050); // Top position (adjust value based on your setup)
         } else if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_DOWN)) {
             depositSubsystem.setTargetSlide(0); // Zero position
-        } else if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_LEFT)) {
+        } else if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_LEFT) && depositSubsystem.getTargetSlide() < 3000) {
             depositSubsystem.setTargetSlide(depositSubsystem.getTargetSlide() + 50); // Middle position (adjust value based on your setup)
         }
         else if(gamepad2Ex.getButton(GamepadKeys.Button.DPAD_RIGHT)){
@@ -138,7 +138,19 @@ public class DriveMT extends OpMode {
             depositSubsystem.closeClaw();
         }
 
+        if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
+ // Close claw
+            depositSubsystem.setTiltPlace();
+            depositSubsystem.tiltPlacespec();
+        }
+        else if(depositSubsystem.liftMotor1.getCurrentPosition()> 1000){
+            depositSubsystem.tiltPlaceSpec();
+        }
+        else if(depositSubsystem.liftMotor1.getCurrentPosition()> 250 && depositSubsystem.liftMotor1.getCurrentPosition()<450){
+            depositSubsystem.setTiltCollect();
+            depositSubsystem.tiltPlacec();
 
+        }
 
         // Update subsystems
         depositSubsystem.updateSlide();

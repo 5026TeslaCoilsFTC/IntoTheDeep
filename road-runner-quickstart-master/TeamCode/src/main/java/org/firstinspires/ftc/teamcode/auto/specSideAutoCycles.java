@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 @Config
-@Autonomous(name ="specSideAuto4Spec", group = "Autonomous")
+@Autonomous(name ="specSideAuto3Spec", group = "Autonomous")
 public class specSideAutoCycles extends LinearOpMode{
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
@@ -38,6 +38,9 @@ public class specSideAutoCycles extends LinearOpMode{
         collect1M,
         collect1S,
         place1M,
+        collect2M,
+        collect2S,
+        place2M,
         idle
 
     }
@@ -54,10 +57,14 @@ public class specSideAutoCycles extends LinearOpMode{
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
         TrajectoryActionBuilder preloadspecPlace = drive.actionBuilder(intialPose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(10, -32, Math.toRadians(-90)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(10, -31, Math.toRadians(-90)), Math.toRadians(90));
         Action preloadSpec;
         preloadSpec = preloadspecPlace.build();
-        TrajectoryActionBuilder pushZone = drive.actionBuilder(drive.pose)
+        TrajectoryActionBuilder pushZone = drive.actionBuilder(new Pose2d(10, -31, Math.toRadians(-90)
+
+
+
+                ))
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(10, -40, Math.toRadians(-90)), Math.toRadians(0))
                 .setTangent(Math.toRadians(0))
@@ -66,28 +73,55 @@ public class specSideAutoCycles extends LinearOpMode{
                 .waitSeconds(.4);
         Action PushZone;
         PushZone = pushZone.build();
-        TrajectoryActionBuilder pushZoneC = drive.actionBuilder(drive.pose)
+        TrajectoryActionBuilder pushZoneC = drive.actionBuilder(new Pose2d(49, -36.5, Math.toRadians(90)))
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(50, -45), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(53, -44.5), Math.toRadians(90))
                 ;
         Action PushZoneC;
         PushZoneC = pushZoneC.build();
-        TrajectoryActionBuilder collectSpec = drive.actionBuilder(drive.pose)
+        TrajectoryActionBuilder collectSpec = drive.actionBuilder(new Pose2d(50, -45, Math.toRadians(90)))
 
+                .waitSeconds(.5)
+                .setTangent(Math.toRadians(0))
 
-                .setTangent(Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(53, -50.5), Math.toRadians(90))
+                .waitSeconds(.5);
 
-                .splineToConstantHeading(new Vector2d(42, -50.5), Math.toRadians(90));
 
         Action CollectSpec;
         CollectSpec = collectSpec.build();
-        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(drive.pose)
+        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(new Pose2d(42, -50.5, Math.toRadians(90)))
                 .waitSeconds(.4)
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(10, -31, Math.toRadians(-90)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(-90)), Math.toRadians(90));
         Action SpecPlace1;
 //        Action closeClaw = depositSubsystem.closeClaw();
         SpecPlace1 = specPlace1.build();
+        TrajectoryActionBuilder collectSpec2 = drive.actionBuilder(new Pose2d(10, -30, Math.toRadians(-90)))
+                .splineToLinearHeading(new Pose2d(10, -45, Math.toRadians(-90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(42,-45, Math.toRadians(-90)), Math.toRadians(-90))
+                .setTangent(Math.toRadians(180))
+
+                .splineToLinearHeading(new Pose2d(50, -40, Math.toRadians(90)), Math.toRadians(-90))
+                .setTangent(Math.toRadians(0))
+
+                .splineToLinearHeading(new Pose2d(50, -53, Math.toRadians(90)), Math.toRadians(-90));
+
+
+        Action CollectSpec2;
+        CollectSpec2 = collectSpec2.build();
+        TrajectoryActionBuilder specPlace2 = drive.actionBuilder(new Pose2d(53, -50.5, Math.toRadians(90)))
+                .waitSeconds(.4)
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(5, -30, Math.toRadians(-90)), Math.toRadians(90));
+        Action SpecPlace2;
+        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(5, -30, Math.toRadians(-90)))
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(42, -58, Math.toRadians(-90)), Math.toRadians(90));
+//        Action closeClaw = depositSubsystem.closeClaw();
+        SpecPlace2 = specPlace2.build();
+        Action Park;
+        Park = park.build();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
         depositSubsystem.setTiltPlace();
@@ -96,6 +130,8 @@ public class specSideAutoCycles extends LinearOpMode{
         ElapsedTime collect = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
             depositSubsystem.updateSlide();
+            telemetry.addData("Claw Close: ", clawClose.seconds());
+            telemetry.update();
             switch (stage) {
                 case preloadM:
                     Actions.runBlocking(
@@ -145,15 +181,16 @@ public class specSideAutoCycles extends LinearOpMode{
                     if(collect.seconds() >1.5){
                         collectionSubsystem.stopCollection();
                         depositSubsystem.closeClaw();
+
                     }
                     if(collect.seconds()>2&& collect.seconds()<2.25){
-
+                        depositSubsystem.setTargetSlide(300);
                         depositSubsystem.setTiltSpecCollect();
 
                     }
                     else if(collect.seconds()>3.25 && collect.seconds()<3.5){
                         depositSubsystem.tiltPlace();
-
+                        depositSubsystem.setTargetSlide(0);
 
                         stage = Stage.collect1M;
                 }
@@ -163,9 +200,11 @@ public class specSideAutoCycles extends LinearOpMode{
                             PushZoneC
                     );
                     depositSubsystem.openClaw();
+
                     Actions.runBlocking(
                             CollectSpec
                     );
+
                     clawClose.reset();
                     stage = Stage.collect1S;
 
@@ -190,11 +229,49 @@ public class specSideAutoCycles extends LinearOpMode{
 
                     );
 
-                    stage = Stage.idle;
+                    stage = Stage.collect2M;
 
                     break;
-                case idle:
+                case collect2M:
 
+                    depositSubsystem.openClaw();
+                    depositSubsystem.setTiltSpecCollect();
+                    depositSubsystem.tiltPlace();
+                    Actions.runBlocking(
+                            new SequentialAction(
+                                    CollectSpec2
+                            )
+                    );
+                    clawClose.reset();
+                    stage = Stage.collect2S;
+                    break;
+                case collect2S:
+                    if(clawClose.seconds()>.4){
+                        depositSubsystem.closeClaw();
+                    }
+
+                    if(clawClose.seconds()> 1.5) {// Close claw
+                        depositSubsystem.setTiltPlace();
+                        depositSubsystem.tiltPlacespec();
+                        stage = Stage.place2M;
+                    }
+                    break;
+                case place2M:
+
+
+                    Actions.runBlocking(
+                            new SequentialAction(
+                                    SpecPlace2
+                            )
+                    );
+                    stage = Stage.idle;
+                    break;
+
+                case idle:
+                    depositSubsystem.openClaw();
+                    Actions.runBlocking(
+                            new SequentialAction(Park)
+                    );
                     break;
 
 

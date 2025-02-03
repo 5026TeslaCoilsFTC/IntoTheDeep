@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Trajectory;
@@ -26,8 +27,8 @@ import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 @Config
-@Autonomous(name ="Basket Side Auto", group = "Autonomous")
-public class basketSideAuto extends LinearOpMode{
+@Autonomous(name ="Basket Side Auto Cycle", group = "Autonomous")
+public class basketSideCycle extends LinearOpMode{
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
     private CollectionSubsystem collectionSubsystem;
@@ -42,8 +43,6 @@ public class basketSideAuto extends LinearOpMode{
         collect2S,
         place2M,
         place2S,
-        collect3M,
-        collect3S,
         end,
         idle
 
@@ -57,33 +56,28 @@ public class basketSideAuto extends LinearOpMode{
         depositSubsystem.closeClaw();
         depositSubsystem.tiltPlacespec();
 
-        Pose2d intialPose = new Pose2d(-15, -61, Math.toRadians(-90));
+        Pose2d intialPose = new Pose2d(-30, -61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
-        TrajectoryActionBuilder preloadspecPlace = drive.actionBuilder(intialPose)
+        TrajectoryActionBuilder preloadBasketPlace = drive.actionBuilder(intialPose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-15, -30, Math.toRadians(-90)), Math.toRadians(90));
-        TrajectoryActionBuilder collect1 = drive.actionBuilder(new Pose2d(-15, -32, Math.toRadians(-90)))
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(-10,-50,Math.toRadians(-90)),Math.toRadians(-90))
-                .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-49,-32,Math.toRadians(110)),Math.toRadians(180));
-        TrajectoryActionBuilder place1 = drive.actionBuilder(new Pose2d(-49,-32,Math.toRadians(110)))
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(-65,-42,Math.toRadians(45)),Math.toRadians(-90))
-
-                ;
-        TrajectoryActionBuilder collect2 = drive.actionBuilder(new Pose2d(-66,-42,Math.toRadians(45)))
+                .splineToLinearHeading(new Pose2d(-60,-42,Math.toRadians(45)),Math.toRadians(135));
+        TrajectoryActionBuilder collect1 = drive.actionBuilder(new Pose2d(-66,-42,Math.toRadians(45)))
                 .setTangent(Math.toRadians(70))
-                .splineToLinearHeading(new Pose2d(-57, -32, Math.toRadians(120)),Math.toRadians(70));
-        TrajectoryActionBuilder place2 = drive.actionBuilder(new Pose2d(-57,-32,Math.toRadians(120)))
+                .splineToLinearHeading(new Pose2d(-56,-32,Math.toRadians(110)),Math.toRadians(70));
+        TrajectoryActionBuilder place1 = drive.actionBuilder(new Pose2d(-56,-32,Math.toRadians(110)))
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(-65,-42,Math.toRadians(45)),Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-66,-42,Math.toRadians(45)),Math.toRadians(135))
 
                 ;
-        TrajectoryActionBuilder collect3 = drive.actionBuilder(new Pose2d(-65,-42,Math.toRadians(45)))
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(-60, -30, Math.toRadians(180)), Math.toRadians(180));
-        TrajectoryActionBuilder backUp = drive.actionBuilder(new Pose2d(-66,-42,Math.toRadians(45)))
+        TrajectoryActionBuilder collect2 = drive.actionBuilder(new Pose2d(-58,-55,Math.toRadians(45)))
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-56,-32,Math.toRadians(110)),Math.toRadians(180));
+        TrajectoryActionBuilder place2 = drive.actionBuilder(new Pose2d(-56,-32,Math.toRadians(110)))
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-64,-56,Math.toRadians(45)),Math.toRadians(-90))
+
+                ;
+        TrajectoryActionBuilder backUp = drive.actionBuilder(new Pose2d(-66,-44,Math.toRadians(45)))
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(-56,-38,Math.toRadians(45)),Math.toRadians(-90))
                 ;
@@ -95,13 +89,12 @@ public class basketSideAuto extends LinearOpMode{
         Place2 = place2.build();
         Action Collect2;
         Collect2 = collect2.build();
-        Action Collect3;
-        Collect3 = collect3.build();
-        Action preloadSpec;
-        preloadSpec = preloadspecPlace.build();
+        Action preloadBasket;
+        preloadBasket = preloadBasketPlace.build();
         Action End;
         End = backUp.build();
-
+        Action liftHigh;
+        liftHigh = LiftHigh();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
         depositSubsystem.setTiltPlace();
@@ -125,9 +118,12 @@ public class basketSideAuto extends LinearOpMode{
             }
             switch (stage) {
                 case preloadM:
+                    depositSubsystem.setTargetSlide(3300);
                     Actions.runBlocking(
+
                             new SequentialAction(
-                                    preloadSpec
+                                    preloadBasket
+
 
                             )
 
@@ -137,8 +133,7 @@ public class basketSideAuto extends LinearOpMode{
                     depositSubsystem.openClaw();
 //                    depositSubsystem.setTiltCollect();
 //                    depositSubsystem.tiltPlacec();
-                    collectionSubsystem.tiltRetract();
-                    collectionSubsystem.collect();
+
                     stage = Stage.collect1M;
                     break;
                 case collect1M:
@@ -166,18 +161,18 @@ public class basketSideAuto extends LinearOpMode{
                         depositSubsystem.tiltPlacec();
                         depositSubsystem.openClaw();
                     }
-                    if (collect.seconds()>1.75) {
+                    if (collect.seconds()>1.5) {
                         collectionSubsystem.stopCollection();
 
                     }
-                    if(collect.seconds()>2){
+                    if(collect.seconds()>1.75){
                         depositSubsystem.closeClaw();
 
                         stage = Stage.place1M;
                     }
                     break;
                 case place1M:
-                    depositSubsystem.setTargetSlide(3050);
+                    depositSubsystem.setTargetSlide(3300);
                     Actions.runBlocking(
                             new SequentialAction(
                                     Place1
@@ -196,109 +191,79 @@ public class basketSideAuto extends LinearOpMode{
 
                     }
                     if(closeClaw.seconds()>3.5){
-                        stage = Stage.collect2M;// Close claw
+                        stage = Stage.end;// Close claw
                     }
+                    if(closeClaw.seconds()> 2) {
+                        depositSubsystem.setTiltPlace();
+                        depositSubsystem.tiltPlaceSpec();
 
-                    break;
-
-
-                case collect2M:
-                    collectionSubsystem.tiltRetract();
-                    collectionSubsystem.collect();
-                    depositSubsystem.setTargetSlide(0);
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    Collect2
-
-                            )
-
-
-                    );
-
-                    collect.reset();
-                    stage =Stage.collect2S;
-                    break;
-                case collect2S:
-                    if(collect.seconds()> .75&& collect.seconds()<1){
-                        collectionSubsystem.stopCollection();
-                        collectionSubsystem.tiltCollect();
-
-                    }
-                    if (collect.seconds()>1&& collect.seconds()<1.25){
-                        collectionSubsystem.reverseCollection();
-                        depositSubsystem.setTiltCollect();
-                        depositSubsystem.tiltPlacec();
-                        depositSubsystem.openClaw();
-                    }
-                    if (collect.seconds()>1.75) {
-                        collectionSubsystem.stopCollection();
-
-                    }
-                    if(collect.seconds()>2){
-                        depositSubsystem.closeClaw();
-
-                        stage = Stage.place2M;
                     }
                     break;
-                case place2M:
-                    depositSubsystem.setTargetSlide(3050);
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    Place2
-
-                            )
 
 
-                    );
-                    closeClaw.reset();
-                    stage =Stage.place2S;
-                    break;
-                case place2S:
-                    if(depositSubsystem.liftMotor1.getCurrentPosition()> 3000) {
-
-                        depositSubsystem.openClaw();
-                        stage = Stage.collect3M;
-                    }// Close claw
-
-                    break;
-                case collect3M:
-                    collectionSubsystem.tiltRetract();
-                    collectionSubsystem.collect();
-                    depositSubsystem.setTargetSlide(0);
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    Collect3
-
-                            )
-
-
-                    );
-
-                    collect.reset();
-                    stage =Stage.collect3S;
-                    break;
-                case collect3S:
-                    if(collect.seconds()> .75&& collect.seconds()<1){
-                        collectionSubsystem.stopCollection();
-                        collectionSubsystem.tiltCollect();
-
-                    }
-                    if (collect.seconds()>1&& collect.seconds()<1.25){
-                        collectionSubsystem.reverseCollection();
-                        depositSubsystem.setTiltCollect();
-                        depositSubsystem.tiltPlacec();
-                        depositSubsystem.openClaw();
-                    }
-                    if (collect.seconds()>1.75) {
-                        collectionSubsystem.stopCollection();
-
-                    }
-                    if(collect.seconds()>2){
-                        depositSubsystem.closeClaw();
-
-                        stage = Stage.idle;
-                    }
-                    break;
+//                case collect2M:
+//                    collectionSubsystem.tiltRetract();
+//                    collectionSubsystem.collect();
+//                    depositSubsystem.setTargetSlide(0);
+//                    Actions.runBlocking(
+//                            new SequentialAction(
+//                                    Collect2
+//
+//                            )
+//
+//
+//                    );
+//
+//                    collect.reset();
+//                    stage =Stage.idle;
+//                    break;
+//                case collect2S:
+//                    if(collect.seconds()> .5&& collect.seconds()<1){
+//                        collectionSubsystem.stopCollection();
+//                        collectionSubsystem.tiltCollect();
+//
+//                    }
+//                    if (collect.seconds()>1&& collect.seconds()<1.25){
+//                        collectionSubsystem.reverseCollection();
+//                        depositSubsystem.setTiltCollect();
+//                        depositSubsystem.tiltPlacec();
+//                        depositSubsystem.openClaw();
+//                    }
+//                    if (collect.seconds()>1.5) {
+//                        collectionSubsystem.stopCollection();
+//
+//                    }
+//                    if(collect.seconds()>1.75){
+//                        depositSubsystem.closeClaw();
+//
+//                        stage = Stage.place2M;
+//                    }
+//                    break;
+//                case place2M:
+//                    depositSubsystem.setTargetSlide(3300);
+//                    Actions.runBlocking(
+//                            new SequentialAction(
+//                                    Place2
+//
+//                            )
+//
+//
+//                    );
+//                    closeClaw.reset();
+//                    stage =Stage.place2S;
+//                    break;
+//                case place2S:
+//                    if(closeClaw.seconds()> 3) {
+//
+//                        depositSubsystem.openClaw();
+//                        stage = Stage.idle;
+//                    }// Close claw
+//                    if(closeClaw.seconds()> 2) {
+//                        depositSubsystem.setTiltPlace();
+//                        depositSubsystem.tiltPlaceSpec();
+//
+//                    }
+//                    break;
                 case end:
                     Actions.runBlocking(
                             new SequentialAction(
@@ -323,6 +288,18 @@ public class basketSideAuto extends LinearOpMode{
 
             }
         }
+
+
+    }
+
+    public Action LiftHigh(){
+        return new Action(){
+            public boolean run(@NonNull TelemetryPacket packet){
+                depositSubsystem.setTargetSlide(3300);
+
+                return true;
+            }
+        };
     }
 
 }
