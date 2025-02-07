@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.arcrobotics.ftclib.controller.PIDFController;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -13,11 +13,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @TeleOp(name = "Lift PIDF Tuning", group = "TeleOp")
 public class LiftPIDTest extends OpMode {
 
-    private DcMotor liftMotor1, liftMotor2;
-    private PIDFController pidfController;
+    private DcMotor tiltMotor;
+    private PIDController pidController;
 
     // PIDF coefficients
-    public static double p = 0.00, i = 0.0, d = 0.0, f = 0.1;
+    public static double p = 0.01, i = 0.0, d = 0.0006, f = 0.13;
+    public static double tiltMultiplier = 1;
+    double ticks_in_degree = 751.83/180;
     public static double targetPosition = 0.0; // Target lift position (in encoder ticks)
 
     private FtcDashboard dashboard;
@@ -25,18 +27,16 @@ public class LiftPIDTest extends OpMode {
     @Override
     public void init() {
         // Initialize motors
-        liftMotor1 = hardwareMap.get(DcMotor.class, "liftMotor1");
-        liftMotor2 = hardwareMap.get(DcMotor.class, "liftMotor2");
 
-        liftMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        tiltMotor = hardwareMap.get(DcMotor.class, "tiltMotor");
+        tiltMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        liftMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        liftMotor1.setDirection(DcMotor.Direction.REVERSE);
+        tiltMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+       // liftMotor1.setDirection(DcMotor.Direction.REVERSE);
         // Initialize PIDF controller
-        pidfController = new PIDFController(p, i, d, f);
+        pidController = new PIDController(p, i, d);
 
         // Connect to FTC Dashboard
         dashboard = FtcDashboard.getInstance();
@@ -48,6 +48,10 @@ public class LiftPIDTest extends OpMode {
         // Update PIDF coefficients from FTC Dashboard
         updatePIDFCoefficientsFromDashboard();
 
+        int tiltPos = tiltMotor.getCurrentPosition();
+        double pid = pidController.calculate(tiltPos, targetPosition);
+        double ff = Math.cos(Math.toRadians(targetPosition/ ticks_in_degree))*f;
+        double power = pid +ff;
         // Adjust target position with D-pad
         if (gamepad1.dpad_up) {
             targetPosition += 50; // Increase target
@@ -56,28 +60,27 @@ public class LiftPIDTest extends OpMode {
         }
 
         // Get the current lift position
-        int currentPosition = (liftMotor1.getCurrentPosition() + liftMotor2.getCurrentPosition()) / 2;
+
 
         // Set the target position for the PIDF controller
-        pidfController.setSetPoint(targetPosition);
+
 
         // Calculate motor power using PIDF
-        double power = pidfController.calculate(currentPosition);
+
 
         // Apply power to lift motors
-        liftMotor1.setPower(power);
-        liftMotor2.setPower(power);
+tiltMotor.setPower(power* tiltMultiplier);
 
         // Send telemetry to FTC Dashboard
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
         dashboardTelemetry.addData("Target Position", targetPosition);
-        dashboardTelemetry.addData("Current Position", currentPosition);
+        dashboardTelemetry.addData("Current Position", tiltPos);
         dashboardTelemetry.addData("Motor Power", power);
         dashboardTelemetry.update();
 
         // Send telemetry to Driver Station
         telemetry.addData("Target Position", targetPosition);
-        telemetry.addData("Current Position", currentPosition);
+        telemetry.addData("Current Position", tiltPos);
         telemetry.addData("Motor Power", power);
         telemetry.update();
     }
@@ -88,13 +91,13 @@ public class LiftPIDTest extends OpMode {
     private void updatePIDFCoefficientsFromDashboard() {
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-        // Retrieve values from the dashboard or use current ones if not updated
+//         Retrieve values from the dashboard or use current ones if not updated
 //        p = dashboardTelemetry.getDouble("P Coefficient", p);
 //        i = dashboardTelemetry.getDouble("I Coefficient", i);
 //        d = dashboardTelemetry.getDouble("D Coefficient", d);
 //        f = dashboardTelemetry.getDouble("F Coefficient", f);
 
         // Update the PIDF controller with the new coefficients
-        pidfController.setPIDF(p, i, d, f);
+        pidController.setPID(p, i, d);
     }
 }

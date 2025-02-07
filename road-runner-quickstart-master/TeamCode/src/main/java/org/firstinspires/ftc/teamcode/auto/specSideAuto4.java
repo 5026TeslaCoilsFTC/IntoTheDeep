@@ -46,9 +46,9 @@ public class specSideAuto4 extends LinearOpMode{
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry);
-        depositSubsystem.setTilt(.25);
+
         depositSubsystem.closeClaw();
-        depositSubsystem.tiltPlacespec();
+
 
         Pose2d intialPose = new Pose2d(10, -61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
@@ -91,7 +91,7 @@ public class specSideAuto4 extends LinearOpMode{
         SpecPlace1 = specPlace1.build();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
-        depositSubsystem.setTiltPlace();
+        depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         ElapsedTime collect = new ElapsedTime();

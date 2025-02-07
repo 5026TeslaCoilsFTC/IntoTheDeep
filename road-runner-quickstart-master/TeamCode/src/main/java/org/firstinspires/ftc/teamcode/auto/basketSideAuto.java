@@ -53,9 +53,9 @@ public class basketSideAuto extends LinearOpMode{
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry);
-        depositSubsystem.setTilt(.27);
+
         depositSubsystem.closeClaw();
-        depositSubsystem.tiltPlacespec();
+
 
         Pose2d intialPose = new Pose2d(-15, -61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
@@ -104,22 +104,23 @@ public class basketSideAuto extends LinearOpMode{
 
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
-        depositSubsystem.setTiltPlace();
+        depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime closeClaw = new ElapsedTime();
         ElapsedTime collect = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
+            depositSubsystem.updateTilt();
             depositSubsystem.updateSlide();
             if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
                 // Close claw
-                depositSubsystem.setTiltPlace();
+                depositSubsystem.armPlace();
                 depositSubsystem.tiltPlacespec();
             }
             else if(depositSubsystem.liftMotor1.getCurrentPosition()> 1000){
                 depositSubsystem.tiltPlaceSpec();
             }
             else if(depositSubsystem.liftMotor1.getCurrentPosition()> 250 && depositSubsystem.liftMotor1.getCurrentPosition()<450){
-                depositSubsystem.setTiltCollect();
+                depositSubsystem.armCollect();
                 depositSubsystem.tiltPlacec();
 
             }
@@ -162,7 +163,7 @@ public class basketSideAuto extends LinearOpMode{
                     }
                     if (collect.seconds()>1&& collect.seconds()<1.25){
                         collectionSubsystem.reverseCollection();
-                        depositSubsystem.setTiltCollect();
+                        depositSubsystem.armCollect();
                         depositSubsystem.tiltPlacec();
                         depositSubsystem.openClaw();
                     }
@@ -226,7 +227,7 @@ public class basketSideAuto extends LinearOpMode{
                     }
                     if (collect.seconds()>1&& collect.seconds()<1.25){
                         collectionSubsystem.reverseCollection();
-                        depositSubsystem.setTiltCollect();
+                        depositSubsystem.armCollect();
                         depositSubsystem.tiltPlacec();
                         depositSubsystem.openClaw();
                     }
@@ -285,7 +286,7 @@ public class basketSideAuto extends LinearOpMode{
                     }
                     if (collect.seconds()>1&& collect.seconds()<1.25){
                         collectionSubsystem.reverseCollection();
-                        depositSubsystem.setTiltCollect();
+                        depositSubsystem.armCollect();
                         depositSubsystem.tiltPlacec();
                         depositSubsystem.openClaw();
                     }

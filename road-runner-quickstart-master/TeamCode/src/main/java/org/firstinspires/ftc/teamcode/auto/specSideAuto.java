@@ -45,9 +45,8 @@ public class specSideAuto extends LinearOpMode{
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry);
-        depositSubsystem.setTilt(.25);
         depositSubsystem.closeClaw();
-        depositSubsystem.tiltPlacespec();
+
 
         Pose2d intialPose = new Pose2d(10, -61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
@@ -78,10 +77,11 @@ public class specSideAuto extends LinearOpMode{
         SpecPlace1 = specPlace1.build();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
-        depositSubsystem.setTiltPlace();
+        depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
+            depositSubsystem.updateTilt();
             depositSubsystem.updateSlide();
             switch (stage) {
                 case preloadM:
@@ -95,7 +95,7 @@ public class specSideAuto extends LinearOpMode{
                 );
 
                     depositSubsystem.openClaw();
-                    depositSubsystem.setTiltSpecCollect();
+                    depositSubsystem.armCollectSpec();
                     depositSubsystem.tiltPlace();// Open claw
                     stage = Stage.collect1M;
 
@@ -110,7 +110,7 @@ public class specSideAuto extends LinearOpMode{
 
                 );
                 depositSubsystem.openClaw(); // Open claw
-                depositSubsystem.setTiltSpecCollect();
+                depositSubsystem.armCollectSpec();
                 depositSubsystem.tiltPlace();
 
                     clawClose.reset();
@@ -122,7 +122,7 @@ public class specSideAuto extends LinearOpMode{
                         depositSubsystem.closeClaw();
                     }
                     if(clawClose.seconds()> .8){
-                        depositSubsystem.setTiltPlace();
+                        depositSubsystem.armPlace();
                         depositSubsystem.tiltPlacespec();
                         stage = Stage.place1M;
                     }

@@ -45,9 +45,9 @@ public class oneSpec extends LinearOpMode{
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry);
-        depositSubsystem.setTilt(.25);
+
         depositSubsystem.closeClaw();
-        depositSubsystem.tiltPlacespec();
+
 
         Pose2d intialPose = new Pose2d(10, -61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
@@ -78,11 +78,48 @@ public class oneSpec extends LinearOpMode{
         SpecPlace1 = specPlace1.build();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
-        depositSubsystem.setTiltPlace();
+        depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
+            depositSubsystem.updateTilt();
             depositSubsystem.updateSlide();
+            if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
+                // Close claw
+                depositSubsystem.armPlace();
+
+            }
+            else if(depositSubsystem.liftMotor1.getCurrentPosition()> 1000){
+                depositSubsystem.tiltPlaceSpec();
+            }
+            else if(depositSubsystem.liftMotor1.getCurrentPosition()> 250 && depositSubsystem.liftMotor1.getCurrentPosition()<450){
+                depositSubsystem.armCollect();
+                depositSubsystem.tiltPlacec();
+
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition()<300 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
+                telemetry.addLine("tilt less than 300");
+                if(depositSubsystem.tiltMotor.getCurrentPosition()> 150) {
+                    telemetry.addLine("tilt less than 300 & greater than 150");
+                    depositSubsystem.tiltPlacespec();
+                }
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition()<150 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
+                telemetry.addLine("tilt less than 200");
+                if(depositSubsystem.tiltMotor.getCurrentPosition()> 0) {
+                    telemetry.addLine("tilt less than 200 & greater than zero");
+                    depositSubsystem.tiltPlace();            }
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition()<600 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
+                telemetry.addLine("tilt less than 600");
+                if(depositSubsystem.tiltMotor.getCurrentPosition()> 450) {
+                    telemetry.addLine("tilt less than 600 & greater than 450");
+                    depositSubsystem.tiltPlacec();            }
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition() < 300 && depositSubsystem.liftMotor1.getCurrentPosition()> 3000){
+                depositSubsystem.tiltPlaceSpec();
+
+            }
             switch (stage) {
                 case preloadM:
                     Actions.runBlocking(
@@ -109,7 +146,7 @@ public class oneSpec extends LinearOpMode{
 
                     );
                     depositSubsystem.openClaw(); // Open claw
-                    depositSubsystem.setTiltSpecCollect();
+                    depositSubsystem.armCollectSpec();
                     depositSubsystem.tiltPlace();
 
                     clawClose.reset();
@@ -121,7 +158,7 @@ public class oneSpec extends LinearOpMode{
                         depositSubsystem.closeClaw();
                     }
                     if(clawClose.seconds()> .8){
-                        depositSubsystem.setTiltPlace();
+                        depositSubsystem.armPlace();
                         depositSubsystem.tiltPlacespec();
                         stage = Stage.place1M;
                     }

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Trajectory;
@@ -14,6 +15,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
@@ -22,25 +24,29 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.action.ContinousTiltUpdate;
 import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 @Config
-@Autonomous(name ="specSideAuto3Spec", group = "Autonomous")
-public class specSideAutoCycles extends LinearOpMode{
+@Autonomous(name ="specSideAuto3SpecPush", group = "Autonomous")
+public class specSideAutoPushCyclec extends LinearOpMode{
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
     private CollectionSubsystem collectionSubsystem;
     private enum Stage{
         preloadM,
         pushIntoZone,
-        collectZone1,
+        place1M,
         collect1M,
         collect1S,
-        place1M,
+
         collect2M,
         collect2S,
         place2M,
+
+
+
         idle
 
     }
@@ -49,48 +55,58 @@ public class specSideAutoCycles extends LinearOpMode{
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry);
-
+        depositSubsystem.tiltMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        depositSubsystem.tiltMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         depositSubsystem.closeClaw();
-
 
         Pose2d intialPose = new Pose2d(10, -61, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, intialPose);
         TrajectoryActionBuilder preloadspecPlace = drive.actionBuilder(intialPose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(10, -31, Math.toRadians(-90)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(-90)), Math.toRadians(90));
         Action preloadSpec;
         preloadSpec = preloadspecPlace.build();
-        TrajectoryActionBuilder pushZone = drive.actionBuilder(new Pose2d(10, -31, Math.toRadians(-90)
+        TrajectoryActionBuilder backUp = drive.actionBuilder(new Pose2d(10, -30, Math.toRadians(-90)
 
 
 
                 ))
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(10, -40, Math.toRadians(-90)), Math.toRadians(0))
-                .setTangent(Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(49, -36.5, Math.toRadians(90)), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(25, -42, Math.toRadians(0)), Math.toRadians(-90));
 
-                .waitSeconds(.4);
+        TrajectoryActionBuilder pushZone = drive.actionBuilder(new Pose2d(25, -42, Math.toRadians(0)
+
+
+
+                ))
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(45, -10, Math.toRadians(0)), Math.toRadians(0))
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(45,-50, Math.toRadians(0)), Math.toRadians(-90))
+                .waitSeconds(.1)
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(53,-10,Math.toRadians(0)),Math.toRadians(0))
+                .waitSeconds(.3)
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(54,-50, Math.toRadians(0)), Math.toRadians(-90))
+
+                ;
+
+
+        Action BackUp;
+        BackUp = backUp.build();
         Action PushZone;
         PushZone = pushZone.build();
-        TrajectoryActionBuilder pushZoneC = drive.actionBuilder(new Pose2d(49, -36.5, Math.toRadians(90)))
+        TrajectoryActionBuilder collectSpec = drive.actionBuilder(new Pose2d(54, -50, Math.toRadians(0)))
                 .setTangent(Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(53, -44.5), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(54,-40, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(54, -53, Math.toRadians(90)), Math.toRadians(-90))
                 ;
-        Action PushZoneC;
-        PushZoneC = pushZoneC.build();
-        TrajectoryActionBuilder collectSpec = drive.actionBuilder(new Pose2d(50, -45, Math.toRadians(90)))
 
-                .waitSeconds(.5)
-                .setTangent(Math.toRadians(0))
-
-                .splineToConstantHeading(new Vector2d(53, -50.5), Math.toRadians(90))
-                .waitSeconds(.5);
 
 
         Action CollectSpec;
         CollectSpec = collectSpec.build();
-        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(new Pose2d(42, -50.5, Math.toRadians(90)))
+        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(new Pose2d(54, -53, Math.toRadians(-90)))
                 .waitSeconds(.4)
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(-90)), Math.toRadians(90));
@@ -120,26 +136,77 @@ public class specSideAutoCycles extends LinearOpMode{
                 .splineToLinearHeading(new Pose2d(42, -58, Math.toRadians(-90)), Math.toRadians(90));
 //        Action closeClaw = depositSubsystem.closeClaw();
         SpecPlace2 = specPlace2.build();
+        ContinousTiltUpdate tiltAction = new ContinousTiltUpdate(depositSubsystem) {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                return false;
+            }
+        };
         Action Park;
         Park = park.build();
         waitForStart();
-        depositSubsystem.closeClaw(); // Close claw
-
+        depositSubsystem.closeClaw();
+        depositSubsystem.updateSlide();// Close claw
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         ElapsedTime collect = new ElapsedTime();
-        while (opModeIsActive()) {
-            depositSubsystem.updateTilt();
-            depositSubsystem.updateSlide();
+        while (opModeIsActive() && !isStopRequested()) {
+
+
+
+// Start tilt control in a separate thread (non-blocking)
+            Thread tiltThread = new Thread(() -> {
+                while (opModeIsActive() && !isStopRequested()) {
+                    depositSubsystem.updateTilt();
+                }
+            });
+            tiltThread.start();
+            if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
+                // Close claw
+                depositSubsystem.armPlace();
+
+            }
+            else if(depositSubsystem.liftMotor1.getCurrentPosition()> 1000){
+                depositSubsystem.tiltPlaceSpec();
+            }
+            else if(depositSubsystem.liftMotor1.getCurrentPosition()> 250 && depositSubsystem.liftMotor1.getCurrentPosition()<450){
+                depositSubsystem.armCollect();
+                depositSubsystem.tiltPlacec();
+
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition()<300 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
+                telemetry.addLine("tilt less than 300");
+                if(depositSubsystem.tiltMotor.getCurrentPosition()> 150) {
+                    telemetry.addLine("tilt less than 300 & greater than 150");
+                    depositSubsystem.tiltPlacespec();
+                }
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition()<150 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
+                telemetry.addLine("tilt less than 200");
+                if(depositSubsystem.tiltMotor.getCurrentPosition()> 0) {
+                    telemetry.addLine("tilt less than 200 & greater than zero");
+                    depositSubsystem.tiltPlace();            }
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition()<600 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
+                telemetry.addLine("tilt less than 600");
+                if(depositSubsystem.tiltMotor.getCurrentPosition()> 450) {
+                    telemetry.addLine("tilt less than 600 & greater than 450");
+                    depositSubsystem.tiltPlacec();            }
+            }
+            if(depositSubsystem.tiltMotor.getCurrentPosition() < 300 && depositSubsystem.liftMotor1.getCurrentPosition()> 3000){
+                depositSubsystem.tiltPlaceSpec();
+
+            }
             telemetry.addData("Claw Close: ", clawClose.seconds());
+            telemetry.addData("Tilt Position: ", depositSubsystem.tiltMotor.getCurrentPosition());
             telemetry.update();
             switch (stage) {
                 case preloadM:
                     depositSubsystem.armPlace();
-                    depositSubsystem.updateTilt();
 
                     Actions.runBlocking(
-                            new SequentialAction(
+                            new ParallelAction(
+
                                     preloadSpec
 
                             )
@@ -152,63 +219,41 @@ public class specSideAutoCycles extends LinearOpMode{
 
                     break;
                 case pushIntoZone:
-
-                    depositSubsystem.updateTilt();
                     //collectionSubsystem.extend();
-                    collectionSubsystem.tiltRetract();
-                    collectionSubsystem.collect();
+
                     Actions.runBlocking(
-                            new SequentialAction(
-                                    PushZone
+                            new ParallelAction(
+                                    BackUp
 
                             )
 
 
                     );
+                    depositSubsystem.armCollect();
+                    depositSubsystem.tiltPlacec();
+                    Actions.runBlocking(
+                            new ParallelAction(
 
+                                    PushZone
+                            )
+                    );
                     collect.reset();
                     clawClose.reset();
-                    stage = Stage.collectZone1;
+                    stage = Stage.collect1M;
                     break;
 
-                case collectZone1:
-                    if(collect.seconds()<.5){
-                       collectionSubsystem.stopCollection();
-                       collectionSubsystem.tiltCollect();
-                      // collectionSubsystem.retractFull();
-                    }
-                    else if(collect.seconds()>.5 && collect.seconds()<.75){
-                        collectionSubsystem.reverseCollection();
-                        depositSubsystem.armCollect();
-                        depositSubsystem.tiltPlacec();
-                        depositSubsystem.openClaw();
 
-                    }
-                    if(collect.seconds() >1.5){
-                        collectionSubsystem.stopCollection();
-                        depositSubsystem.closeClaw();
-
-                    }
-                    if(collect.seconds()>2&& collect.seconds()<2.25){
-                        depositSubsystem.setTargetSlide(300);
-                        depositSubsystem.armCollectSpec();
-
-                    }
-                    else if(collect.seconds()>3.25 && collect.seconds()<3.5){
-                        depositSubsystem.tiltPlace();
-                        depositSubsystem.setTargetSlide(0);
-
-                        stage = Stage.collect1M;
-                }
-                    break;
                 case collect1M:
-                    Actions.runBlocking(
-                            PushZoneC
-                    );
+                    depositSubsystem.armCollectSpec();
+                    depositSubsystem.tiltPlace();
                     depositSubsystem.openClaw();
 
                     Actions.runBlocking(
+                            new ParallelAction(
+
+
                             CollectSpec
+                            )
                     );
 
                     clawClose.reset();
@@ -227,7 +272,8 @@ public class specSideAutoCycles extends LinearOpMode{
                     break;
                 case place1M:
                     Actions.runBlocking(
-                            new SequentialAction(
+                            new ParallelAction(
+
                                     SpecPlace1
 
                             )
@@ -244,7 +290,7 @@ public class specSideAutoCycles extends LinearOpMode{
                     depositSubsystem.armCollectSpec();
                     depositSubsystem.tiltPlace();
                     Actions.runBlocking(
-                            new SequentialAction(
+                            new ParallelAction(
                                     CollectSpec2
                             )
                     );
@@ -266,7 +312,8 @@ public class specSideAutoCycles extends LinearOpMode{
 
 
                     Actions.runBlocking(
-                            new SequentialAction(
+                            new ParallelAction(
+
                                     SpecPlace2
                             )
                     );
@@ -275,9 +322,7 @@ public class specSideAutoCycles extends LinearOpMode{
 
                 case idle:
                     depositSubsystem.openClaw();
-                    Actions.runBlocking(
-                            new SequentialAction(Park)
-                    );
+
                     break;
 
 
@@ -287,9 +332,7 @@ public class specSideAutoCycles extends LinearOpMode{
 //        }
 
             }
-            depositSubsystem.updateTilt();
         }
-
     }
 
 }

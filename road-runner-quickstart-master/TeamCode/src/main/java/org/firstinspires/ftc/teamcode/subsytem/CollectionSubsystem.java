@@ -18,9 +18,9 @@ public class CollectionSubsystem {
     public final double MAX_EXTENSION = 1;
     private final double INCREMENT = 0.005;
 
-    private final double tiltCollectPoz = .82;
+    private final double tiltCollectPoz = .83;
 
-    private final double tiltRetractPoz = .23;
+    private final double tiltRetractPoz = .24;
 
     public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;

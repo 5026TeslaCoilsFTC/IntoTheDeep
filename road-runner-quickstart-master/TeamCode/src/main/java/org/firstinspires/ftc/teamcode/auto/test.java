@@ -26,8 +26,8 @@ import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 @Config
-@Autonomous(name ="specSideAuto3Spec", group = "Autonomous")
-public class specSideAutoCycles extends LinearOpMode{
+@Autonomous(name ="test", group = "Autonomous")
+public class test extends LinearOpMode{
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
     private CollectionSubsystem collectionSubsystem;
@@ -124,170 +124,14 @@ public class specSideAutoCycles extends LinearOpMode{
         Park = park.build();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
-
+        depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         ElapsedTime collect = new ElapsedTime();
         while (opModeIsActive()) {
             depositSubsystem.updateTilt();
             depositSubsystem.updateSlide();
-            telemetry.addData("Claw Close: ", clawClose.seconds());
-            telemetry.update();
-            switch (stage) {
-                case preloadM:
-                    depositSubsystem.armPlace();
-                    depositSubsystem.updateTilt();
 
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    preloadSpec
-
-                            )
-
-
-                    );
-                    depositSubsystem.openClaw();
-// Open claw
-                    stage = Stage.pushIntoZone;
-
-                    break;
-                case pushIntoZone:
-
-                    depositSubsystem.updateTilt();
-                    //collectionSubsystem.extend();
-                    collectionSubsystem.tiltRetract();
-                    collectionSubsystem.collect();
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    PushZone
-
-                            )
-
-
-                    );
-
-                    collect.reset();
-                    clawClose.reset();
-                    stage = Stage.collectZone1;
-                    break;
-
-                case collectZone1:
-                    if(collect.seconds()<.5){
-                       collectionSubsystem.stopCollection();
-                       collectionSubsystem.tiltCollect();
-                      // collectionSubsystem.retractFull();
-                    }
-                    else if(collect.seconds()>.5 && collect.seconds()<.75){
-                        collectionSubsystem.reverseCollection();
-                        depositSubsystem.armCollect();
-                        depositSubsystem.tiltPlacec();
-                        depositSubsystem.openClaw();
-
-                    }
-                    if(collect.seconds() >1.5){
-                        collectionSubsystem.stopCollection();
-                        depositSubsystem.closeClaw();
-
-                    }
-                    if(collect.seconds()>2&& collect.seconds()<2.25){
-                        depositSubsystem.setTargetSlide(300);
-                        depositSubsystem.armCollectSpec();
-
-                    }
-                    else if(collect.seconds()>3.25 && collect.seconds()<3.5){
-                        depositSubsystem.tiltPlace();
-                        depositSubsystem.setTargetSlide(0);
-
-                        stage = Stage.collect1M;
-                }
-                    break;
-                case collect1M:
-                    Actions.runBlocking(
-                            PushZoneC
-                    );
-                    depositSubsystem.openClaw();
-
-                    Actions.runBlocking(
-                            CollectSpec
-                    );
-
-                    clawClose.reset();
-                    stage = Stage.collect1S;
-
-                    break;
-                case collect1S:
-                    if(clawClose.seconds() > .4){
-                        depositSubsystem.closeClaw();
-                    }
-                    if(clawClose.seconds()> .8){
-                        depositSubsystem.armPlace();
-                        depositSubsystem.tiltPlacespec();
-                        stage = Stage.place1M;
-                    }
-                    break;
-                case place1M:
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    SpecPlace1
-
-                            )
-
-
-                    );
-
-                    stage = Stage.collect2M;
-
-                    break;
-                case collect2M:
-
-                    depositSubsystem.openClaw();
-                    depositSubsystem.armCollectSpec();
-                    depositSubsystem.tiltPlace();
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    CollectSpec2
-                            )
-                    );
-                    clawClose.reset();
-                    stage = Stage.collect2S;
-                    break;
-                case collect2S:
-                    if(clawClose.seconds()>.4){
-                        depositSubsystem.closeClaw();
-                    }
-
-                    if(clawClose.seconds()> 1.5) {// Close claw
-                        depositSubsystem.armPlace();
-                        depositSubsystem.tiltPlacespec();
-                        stage = Stage.place2M;
-                    }
-                    break;
-                case place2M:
-
-
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    SpecPlace2
-                            )
-                    );
-                    stage = Stage.idle;
-                    break;
-
-                case idle:
-                    depositSubsystem.openClaw();
-                    Actions.runBlocking(
-                            new SequentialAction(Park)
-                    );
-                    break;
-
-
-
-//        public void PlaceSpec(){
-//            depositSubsystem.closeClaw();
-//        }
-
-            }
-            depositSubsystem.updateTilt();
         }
 
     }
