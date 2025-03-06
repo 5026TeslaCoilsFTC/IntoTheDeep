@@ -129,14 +129,13 @@ public class specSideAutoCycles extends LinearOpMode{
         ElapsedTime clawClose = new ElapsedTime();
         ElapsedTime collect = new ElapsedTime();
         while (opModeIsActive()) {
-            depositSubsystem.updateTilt();
+
             depositSubsystem.updateSlide();
             telemetry.addData("Claw Close: ", clawClose.seconds());
             telemetry.update();
             switch (stage) {
                 case preloadM:
                     depositSubsystem.armPlace();
-                    depositSubsystem.updateTilt();
 
                     Actions.runBlocking(
                             new SequentialAction(
@@ -153,7 +152,7 @@ public class specSideAutoCycles extends LinearOpMode{
                     break;
                 case pushIntoZone:
 
-                    depositSubsystem.updateTilt();
+
                     //collectionSubsystem.extend();
                     collectionSubsystem.tiltRetract();
                     collectionSubsystem.collect();
@@ -287,7 +286,7 @@ public class specSideAutoCycles extends LinearOpMode{
 //        }
 
             }
-            depositSubsystem.updateTilt();
+
         }
 
     }

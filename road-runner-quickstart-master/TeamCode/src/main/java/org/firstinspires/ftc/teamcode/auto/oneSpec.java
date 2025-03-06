@@ -76,13 +76,13 @@ public class oneSpec extends LinearOpMode{
         Action SpecPlace1;
 //        Action closeClaw = depositSubsystem.closeClaw();
         SpecPlace1 = specPlace1.build();
+        depositSubsystem.armMiddle();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
         depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
-            depositSubsystem.updateTilt();
             depositSubsystem.updateSlide();
             if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
                 // Close claw
@@ -97,29 +97,7 @@ public class oneSpec extends LinearOpMode{
                 depositSubsystem.tiltPlacec();
 
             }
-            if(depositSubsystem.tiltMotor.getCurrentPosition()<300 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
-                telemetry.addLine("tilt less than 300");
-                if(depositSubsystem.tiltMotor.getCurrentPosition()> 150) {
-                    telemetry.addLine("tilt less than 300 & greater than 150");
-                    depositSubsystem.tiltPlacespec();
-                }
-            }
-            if(depositSubsystem.tiltMotor.getCurrentPosition()<150 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
-                telemetry.addLine("tilt less than 200");
-                if(depositSubsystem.tiltMotor.getCurrentPosition()> 0) {
-                    telemetry.addLine("tilt less than 200 & greater than zero");
-                    depositSubsystem.tiltPlace();            }
-            }
-            if(depositSubsystem.tiltMotor.getCurrentPosition()<600 && depositSubsystem.liftMotor1.getCurrentPosition()< 200){
-                telemetry.addLine("tilt less than 600");
-                if(depositSubsystem.tiltMotor.getCurrentPosition()> 450) {
-                    telemetry.addLine("tilt less than 600 & greater than 450");
-                    depositSubsystem.tiltPlacec();            }
-            }
-            if(depositSubsystem.tiltMotor.getCurrentPosition() < 300 && depositSubsystem.liftMotor1.getCurrentPosition()> 3000){
-                depositSubsystem.tiltPlaceSpec();
 
-            }
             switch (stage) {
                 case preloadM:
                     Actions.runBlocking(

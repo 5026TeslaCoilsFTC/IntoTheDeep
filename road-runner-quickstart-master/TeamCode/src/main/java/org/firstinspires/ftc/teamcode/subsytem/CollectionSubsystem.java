@@ -8,14 +8,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class CollectionSubsystem {
-    private CRServo extensionServo1, extensionServo2;
+    private Servo extensionServo1, extensionServo2;
     private CRServo collectionServo1, collectionServo2;//this sucks in samples
     private Servo tiltServo1, tiltServo2;
     private Telemetry telemetry;
 
     private double extensionPosition = 0.0;
-    public final double MIN_EXTENSION = 0;
-    public final double MAX_EXTENSION = 1;
+    public final double MIN_EXTENSION = 0.765;
+    public final double MAX_EXTENSION = .3;
     private final double INCREMENT = 0.005;
 
     private final double tiltCollectPoz = .83;
@@ -24,9 +24,10 @@ public class CollectionSubsystem {
 
     public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        extensionServo1 = hardwareMap.get(CRServo.class,
-                "extensionServo1");
-        extensionServo2 = hardwareMap.get(CRServo.class, "extensionServo2");
+        extensionServo1 = hardwareMap.get(Servo.class,
+                "extensionServo");
+        extensionServo1.setDirection(Servo.Direction.REVERSE);
+        extensionServo2 = hardwareMap.get(Servo.class, "extensionServo2");
         tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
         tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
         collectionServo1 = hardwareMap.get(CRServo.class, "intake");
@@ -37,13 +38,12 @@ public class CollectionSubsystem {
     }
 
     public void CRExtend(){
-        extensionServo1.setPower(1);
+        extensionServo1.setPosition(MAX_EXTENSION);
     }
-
+    public void lafeExtend(){extensionServo1.setPosition(.4);}
     public void CRRetract(){
-        extensionServo1.setPower(-1);
+        extensionServo1.setPosition(MIN_EXTENSION);
     }
-    public void Stop(){extensionServo1.setPower(0);}
 //    public void extend() {
 //        extensionPosition = Math.min(extensionPosition + INCREMENT, MAX_EXTENSION);
 //        extensionServo1.setPosition(1);

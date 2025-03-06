@@ -56,32 +56,34 @@ public class specSideAuto extends LinearOpMode{
                 .splineToLinearHeading(new Pose2d(10, -32, Math.toRadians(-90)), Math.toRadians(90));
         Action preloadSpec;
         preloadSpec = preloadspecPlace.build();
-        TrajectoryActionBuilder collectSpec = drive.actionBuilder(drive.pose)
+        TrajectoryActionBuilder collectSpec = drive.actionBuilder(new Pose2d( 10,-32, Math.toRadians(-90)))
 
                 .setTangent(Math.toRadians(0))
 
-                .splineToLinearHeading(new Pose2d(42, -40, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(44, -40, Math.toRadians(90)), Math.toRadians(-90))
                 .setTangent(Math.toRadians(0))
 
-                .splineToLinearHeading(new Pose2d(42, -51, Math.toRadians(90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(44, -51, Math.toRadians(90)), Math.toRadians(-90));
 
         Action CollectSpec;
         CollectSpec = collectSpec.build();
-        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(drive.pose)
+        TrajectoryActionBuilder specPlace1 = drive.actionBuilder(new Pose2d( 42,-51, Math.toRadians(90)))
                 .waitSeconds(.4)
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(8, -40, Math.toRadians(-55)), Math.toRadians(90))
         .splineToLinearHeading(new Pose2d(10, -30, Math.toRadians(-90)), Math.toRadians(90));
+
         Action SpecPlace1;
 //        Action closeClaw = depositSubsystem.closeClaw();
         SpecPlace1 = specPlace1.build();
+        depositSubsystem.armMiddle();
         waitForStart();
         depositSubsystem.closeClaw(); // Close claw
         depositSubsystem.armPlace();
         depositSubsystem.tiltPlacespec();
         ElapsedTime clawClose = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
-            depositSubsystem.updateTilt();
+
             depositSubsystem.updateSlide();
             switch (stage) {
                 case preloadM:

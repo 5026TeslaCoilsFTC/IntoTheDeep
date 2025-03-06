@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsytem;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.InstantFunction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 @Config
 public class DepositSubsystem {
-    public Servo tiltServo1, tiltServo2, clawTiltServo, clawServo;
-    public DcMotor liftMotor1, liftMotor2, tiltMotor;
+    public Servo armL, armR, clawTiltServo, clawServo;
+    public DcMotor liftMotor1, liftMotor2;
     private Telemetry telemetry;
     private enum Lift {
         liftUp,
@@ -22,16 +23,15 @@ public class DepositSubsystem {
         place
     }
     private PIDController slideController;
-    private PIDController tilt;
+
 
     Lift lift = Lift.liftUp;
     ArmPoz armPoz = ArmPoz.collect;
 
     // PID coefficients for slide
     private double pSlide = 0.003, iSlide = 0.0, dSlide = 0.0;
-    public static double pTilt = 0.012, iTilt = 0.0, dTilt = 0.0006;
 
-    public static double fTilt = .13;
+
     // Feedforward coefficient
     private double f = 0.0002;
 
@@ -57,7 +57,9 @@ public class DepositSubsystem {
         this.telemetry = telemetry;
 
         // Initialize hardware
-        tiltMotor = hardwareMap.get(DcMotor.class, "tiltMotor");
+        armL = hardwareMap.get(Servo.class,"armL");
+        armR = hardwareMap.get(Servo.class, "armR");
+        armL.setDirection(Servo.Direction.REVERSE);
         clawTiltServo = hardwareMap.get(Servo.class, "clawServo");
         clawServo = hardwareMap.get(Servo.class, "clawTiltServo");
         liftMotor1 = hardwareMap.get(DcMotor.class, "liftMotor1");
@@ -67,13 +69,34 @@ public class DepositSubsystem {
         liftMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        tiltMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         liftMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor1.setDirection(DcMotor.Direction.REVERSE);
         // Initialize PID controller
         slideController = new PIDController(pSlide, iSlide, dSlide);
-        tilt = new PIDController(pTilt, iTilt, dTilt);
+
+    }
+
+    public void armPlace(){
+        armL.setPosition(.64);
+        armR.setPosition(.64);
+    }
+    public void armCollect(){
+        armL.setPosition(.11);
+        armR.setPosition(.11);
+    }
+    public void armMiddle(){
+        armL.setPosition(.3);
+        armR.setPosition(.3);
+    }
+    public void armCollectSpec() {
+        armL.setPosition(.83);
+        armR.setPosition(.83);
+    }
+    public void armHigh(){
+        armL.setPosition(.5);
+        armR.setPosition(.5);
     }
 
     public void setTargetSlide(double target) {
@@ -84,19 +107,8 @@ public class DepositSubsystem {
         return this.targetSlide;
     }
 
-    public void armPlace(){
-        targetTilt = 200;
-    }
-    public void armCollect(){
-        targetTilt = 540;
-    }
-    public void armCollectSpec(){
-        targetTilt = 50;
-    }
-    public int getArmPoz(){
 
-        return tiltMotor.getCurrentPosition();
-    }
+
     public double getArmTarget(){
         return targetTilt;
     }
@@ -118,23 +130,6 @@ public class DepositSubsystem {
         telemetry.addData("Slide Position", currentSlidePos);
         telemetry.addData("Slide Power", power);
 
-    }
-    public void updateTilt() {
-
-
-        double ticks_in_degree = 751.83/180;
-        int tiltPos = tiltMotor.getCurrentPosition();
-        double pidtilt = tilt.calculate(tiltPos, targetTilt);
-        double fftilt = Math.cos(Math.toRadians(targetTilt/ ticks_in_degree))*fTilt;
-        double powertilt = pidtilt +fftilt;
-
-        tiltMotor.setPower(powertilt);
-
-        telemetry.addData("Tilt Target", targetTilt);
-        telemetry.addData("Tilt Position", tiltPos);
-        telemetry.addData("Tilt Power", powertilt);
-        telemetry.addLine("tilt updatedsdf");
-        tilt = new PIDController(pTilt, iTilt, dTilt);
     }
 
     public void openClaw() {

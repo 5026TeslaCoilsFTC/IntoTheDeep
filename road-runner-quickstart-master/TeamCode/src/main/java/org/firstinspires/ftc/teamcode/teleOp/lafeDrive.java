@@ -11,14 +11,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsytem.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.CollectionSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 
 @Config
-@TeleOp(name = "1 - MT TeleOp", group = "TeleOp")
-public class DriveMT extends OpMode {
+@TeleOp(name = "Drive", group = "TeleOp")
+public class lafeDrive extends OpMode {
 
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
@@ -26,14 +25,12 @@ public class DriveMT extends OpMode {
     private GamepadEx gamepad1Ex, gamepad2Ex;
     double speed = 1;
     public boolean extension = false;
-
-    private BlinkinSubsystem blinkinSubsystem;
     public boolean arm = false;
     public   ElapsedTime elapsedTime = new ElapsedTime();
     public int collect = 0;
     @Override
     public void init() {
-        blinkinSubsystem = new BlinkinSubsystem(hardwareMap, telemetry);
+
         // Initialize subsystems and gamepads
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
@@ -47,7 +44,6 @@ public class DriveMT extends OpMode {
         driveSubsystem.drive(0,0,0, 0);
         //collectionSubsystem.tilt(0.5);
         collectionSubsystem.CRRetract();
-        blinkinSubsystem.setAlternatePurpleGreen();
     }
 
     @Override
@@ -78,16 +74,18 @@ public class DriveMT extends OpMode {
             collectionSubsystem.stopCollection();
         }
 
-      if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+        if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
             collectionSubsystem.CRRetract();
-          collectionSubsystem.tiltCollect();
-          extension = false;
+            collectionSubsystem.tiltCollect();
+            extension = false;
         }
 
+
+
         else if(gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER) && arm == false){
-            collectionSubsystem.CRExtend();
-          collectionSubsystem.tiltCollect();
-          extension = true;
+            collectionSubsystem.lafeExtend();
+            collectionSubsystem.tiltCollect();
+            extension = true;
         }
 
 
@@ -117,7 +115,6 @@ public class DriveMT extends OpMode {
         }
         // Handle tilt and claw with A/B buttons
         if (gamepad2Ex.getButton(GamepadKeys.Button.Y) && extension == false) {
-            blinkinSubsystem.setGreen();
             depositSubsystem.closeClaw(); // Close claw
             depositSubsystem.tiltPlacespec();
             depositSubsystem.armPlace();
@@ -128,7 +125,6 @@ public class DriveMT extends OpMode {
 
 
         if (gamepad2Ex.getButton(GamepadKeys.Button.A)&& extension == false) {
-            blinkinSubsystem.setPurple();
             depositSubsystem.openClaw();
             depositSubsystem.tiltPlace();// Open claw
             depositSubsystem.armCollectSpec();
@@ -137,7 +133,6 @@ public class DriveMT extends OpMode {
         }
 
         if (gamepad2Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
-            blinkinSubsystem.setPurple();
             depositSubsystem.armCollect();
             depositSubsystem.tiltPlacec();
             depositSubsystem.openClaw();
@@ -152,16 +147,14 @@ public class DriveMT extends OpMode {
         }
 
         if(gamepad2Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)> .1){
-            blinkinSubsystem.setPurple();
             depositSubsystem.openClaw();
         }
         else if(gamepad2Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)> .1) {
-            blinkinSubsystem.setGreen();
             depositSubsystem.closeClaw();
         }
 
         if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
- // Close claw
+            // Close claw
             if(extension == false) {
                 depositSubsystem.armPlace();
                 arm = true;

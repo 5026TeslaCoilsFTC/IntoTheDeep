@@ -102,7 +102,6 @@ public class basketSideCycle extends LinearOpMode{
         ElapsedTime closeClaw = new ElapsedTime();
         ElapsedTime collect = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested()) {
-            depositSubsystem.updateTilt();
             depositSubsystem.updateSlide();
             if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
                 // Close claw
