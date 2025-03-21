@@ -1,114 +1,126 @@
 package org.firstinspires.ftc.teamcode.subsytem;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Config
 public class CollectionSubsystem {
-    private Servo extensionServo1, extensionServo2;
-    private CRServo collectionServo1, collectionServo2;//this sucks in samples
-    private Servo tiltServo1, tiltServo2;
+    private Servo extensionServo1;
+    private DcMotor intakeMotor;
+    private Servo tiltServo1;
+    private ColorSensor colorSensor;
     private Telemetry telemetry;
+    private FtcDashboard dashboard;
+    private DepositSubsystem depositSubsystem;
 
-    private double extensionPosition = 0.0;
+    public static double intakePower = 1.0;  // Full speed intake
+    public static double slowIntakePower = .75; // Reduced intake speed when detecting block
+
     public final double MIN_EXTENSION = 0.765;
-    public final double MAX_EXTENSION = .3;
-    private final double INCREMENT = 0.005;
+    public final double MAX_EXTENSION = 0.3;
 
-    private final double tiltCollectPoz = .83;
+    public final double TILT_UP_POSITION = .3;
+    public final double TILT_DOWN_POSITION = .5;
 
-    private final double tiltRetractPoz = .24;
+    public enum IntakeState {
+        IDLE,
+        EXTENDING,
+        INTAKING,
+        SLOWING,
+        RETRACTING,
+        CLOSING_CLAW
+    }
 
-    public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+    private IntakeState currentState = IntakeState.IDLE;
+    private boolean objectDetected = false;
+
+    public CollectionSubsystem(HardwareMap hardwareMap, Telemetry telemetry, DepositSubsystem depositSubsystem) {
         this.telemetry = telemetry;
-        extensionServo1 = hardwareMap.get(Servo.class,
-                "extensionServo");
+        this.dashboard = FtcDashboard.getInstance();
+        this.depositSubsystem = depositSubsystem;
+
+        extensionServo1 = hardwareMap.get(Servo.class, "extensionServo1");
         extensionServo1.setDirection(Servo.Direction.REVERSE);
-        extensionServo2 = hardwareMap.get(Servo.class, "extensionServo2");
         tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
-        tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
-        collectionServo1 = hardwareMap.get(CRServo.class, "intake");
-        collectionServo1.setDirection(CRServo.Direction.REVERSE);
-        collectionServo2 = hardwareMap.get(CRServo.class, "intake2");
-
         tiltServo1.setDirection(Servo.Direction.REVERSE);
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
     }
 
-    public void CRExtend(){
-        extensionServo1.setPosition(MAX_EXTENSION);
-    }
-    public void lafeExtend(){extensionServo1.setPosition(.4);}
-    public void CRRetract(){
-        extensionServo1.setPosition(MIN_EXTENSION);
-    }
-//    public void extend() {
-//        extensionPosition = Math.min(extensionPosition + INCREMENT, MAX_EXTENSION);
-//        extensionServo1.setPosition(1);
-//        extensionServo2.setPosition(1);
-//    }
-//
-//    public void retract() {
-//        extensionPosition = Math.max(extensionPosition - INCREMENT, MIN_EXTENSION);
-//        extensionServo1.setPosition(extensionPosition);
-//        extensionServo2.setPosition(extensionPosition);
-//    }
-//
-//    public void retractFull() {
-//        extensionServo1.setPosition(0);
-//        extensionServo2.setPosition(0);
-//    }
+    public boolean detectValidObject() {
+        int red = colorSensor.red();
+        int blue = colorSensor.blue();
+        int green = colorSensor.green();
 
-    public void tilt(double position) {
-        tiltServo1.setPosition(position);
-        //tiltServo2.setPosition(position);
+        boolean detectedYellow = (red >= 900 && green >= 1300);
+        boolean detectedBlue = (blue >= 500 && red < 900 && green < 1300);
+        boolean detectedRed = (red >= 900 && green < 1300);
+
+        return detectedYellow || detectedBlue || detectedRed;
     }
 
-    public void tiltCollect(){
-        tiltServo1.setPosition(tiltCollectPoz);
-        //tiltServo2.setPosition(tiltCollectPoz);
-    }
+    public void updateState(boolean extendButton) {
+        boolean detected = detectValidObject();
 
-    public void tiltRetract(){
-        tiltServo1.setPosition(tiltRetractPoz);
-        //tiltServo2.setPosition(tiltRetractPoz);
-    }
+        switch (currentState) {
+            case IDLE:
+                if (extendButton) {
+                    currentState = IntakeState.EXTENDING;
+                }
+                break;
 
+            case EXTENDING:
+                if (extensionServo1.getPosition() > MAX_EXTENSION) {
+                    extensionServo1.setPosition(extensionServo1.getPosition() - .015);
+                    tiltServo1.setPosition(TILT_DOWN_POSITION);
+                } else {
+                    currentState = IntakeState.INTAKING;
+                }
+                break;
 
-    public void collect() {
-        collectionServo1.setPower(-1);
-        collectionServo2.setPower(-1);
-    }
+            case INTAKING:
+                intakeMotor.setPower(intakePower);
+                if (detected) {
+                    objectDetected = true;
+                    currentState = IntakeState.SLOWING;
+                }
+                break;
 
-    public void stopCollection() {
-        collectionServo1.setPower(0);
-        collectionServo2.setPower(0);
-    }
+            case SLOWING:
+                intakeMotor.setPower(slowIntakePower);
+                if (!detected) {
+                    currentState = IntakeState.RETRACTING;
+                }
+                break;
 
-    public void reverseCollection() {
-        collectionServo1.setPower(.15);
-        collectionServo2.setPower(.15);
-    }
+            case RETRACTING:
+                intakeMotor.setPower(0);
+                if (extensionServo1.getPosition() < MIN_EXTENSION) {
+                    extensionServo1.setPosition(MIN_EXTENSION);
+                } else {
+                    tiltServo1.setPosition(TILT_UP_POSITION);
+                    currentState = IntakeState.CLOSING_CLAW;
+                }
+                break;
 
-    public void updateTelemetry() {
-        telemetry.addData("Extension Position", extensionPosition);
-        telemetry.addData("Tilt Servo", tiltServo1.getPosition());
-       telemetry.addData("Tilt Servo", tiltServo2.getPosition());
-    }
-//
-//    public void extendToPoz(double pos1, double pos2) {
-//        extensionServo1.setPosition(pos1);
-//        extensionServo2.setPosition(pos2);
-//    }
+            case CLOSING_CLAW:
+                if (extensionServo1.getPosition() >= MIN_EXTENSION && tiltServo1.getPosition() == TILT_UP_POSITION && objectDetected) {
+                    depositSubsystem.closeClaw();
+                    objectDetected = false;
+                    currentState = IntakeState.IDLE;
+                }
+                break;
+        }
 
-    public double getExtensionPoz() {
-        return extensionPosition;
-    }
-
-    public double extendToPoz() {
-        return extensionPosition;
+        telemetry.addData("State", currentState);
+        telemetry.update();
     }
 }
-

@@ -31,13 +31,19 @@ public class DriveMT extends OpMode {
     public boolean arm = false;
     public   ElapsedTime elapsedTime = new ElapsedTime();
     public int collect = 0;
+    private String allianceColor = "RED"; // Change dynamically if needed
+    private boolean collecting = false;
+    private boolean ejecting = false;
+    public static String preMatchColor = "None";
+    public static String mode = "Samples";
     @Override
     public void init() {
+
         blinkinSubsystem = new BlinkinSubsystem(hardwareMap, telemetry);
         // Initialize subsystems and gamepads
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
-        collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry);
+        collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry, depositSubsystem);
 
         gamepad1Ex = new GamepadEx(gamepad1);
         gamepad2Ex = new GamepadEx(gamepad2);
@@ -46,12 +52,24 @@ public class DriveMT extends OpMode {
         //INITIAL START POSITIONS//
         driveSubsystem.drive(0,0,0, 0);
         //collectionSubsystem.tilt(0.5);
-        collectionSubsystem.CRRetract();
+
         blinkinSubsystem.setAlternatePurpleGreen();
+
     }
 
     @Override
     public void loop() {
+        if (gamepad1Ex.getButton(GamepadKeys.Button.B)) {
+            mode = "Specimens";
+        }
+        if (gamepad1Ex.getButton(GamepadKeys.Button.X)) {
+            mode = "Samples";
+        }
+
+        telemetry.addData("Pre-Match Color", preMatchColor);
+        telemetry.addData("Mode", mode);
+
+        telemetry.addData("Alliance Color: ", allianceColor);
         double looptimeStart = elapsedTime.milliseconds();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
@@ -69,37 +87,6 @@ public class DriveMT extends OpMode {
         double turn = gamepad1Ex.getRightX();  // Rotation
         driveSubsystem.drive(drive, strafe, turn, speed);
 
-        // === Collection Controls ===
-        if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-            collectionSubsystem.collect();
-        } else if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
-            collectionSubsystem.reverseCollection();
-        }  else {
-            collectionSubsystem.stopCollection();
-        }
-
-      if (gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-            collectionSubsystem.CRRetract();
-          collectionSubsystem.tiltCollect();
-          extension = false;
-        }
-
-        else if(gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER) && arm == false){
-            collectionSubsystem.CRExtend();
-          collectionSubsystem.tiltCollect();
-          extension = true;
-        }
-
-
-
-        if (gamepad2Ex.getButton(GamepadKeys.Button.B)) {
-            collectionSubsystem.tiltCollect();
-        }
-
-        else if (gamepad2Ex.getButton(GamepadKeys.Button.X)) {
-            collectionSubsystem.tiltRetract();
-        }
-
         // === Deposit Controls ===
         // Handle slide positions with D-Pad
         if (gamepad2Ex.getButton(GamepadKeys.Button.DPAD_UP)) {
@@ -116,7 +103,7 @@ public class DriveMT extends OpMode {
             depositSubsystem.resetLifts();
         }
         // Handle tilt and claw with A/B buttons
-        if (gamepad2Ex.getButton(GamepadKeys.Button.Y) && extension == false) {
+        if (gamepad2Ex.getButton(GamepadKeys.Button.Y)) {
             blinkinSubsystem.setGreen();
             depositSubsystem.closeClaw(); // Close claw
             depositSubsystem.tiltPlacespec();
@@ -189,8 +176,12 @@ public class DriveMT extends OpMode {
         dashboardTelemetry.addData("Loop Time(MS): ", elapsedTime.milliseconds()-looptimeStart );
         dashboardTelemetry.update();
         telemetry.addData("Extension: " , extension);
-        collectionSubsystem.updateTelemetry();
+        collectionSubsystem.updateState(
+                gamepad1Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)
 
+        );
+
+        telemetry.update();
 
     }
 }
