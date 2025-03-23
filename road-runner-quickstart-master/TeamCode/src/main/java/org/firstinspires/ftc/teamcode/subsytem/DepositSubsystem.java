@@ -83,8 +83,8 @@ public class DepositSubsystem {
         armR.setPosition(.64);
     }
     public void armCollect(){
-        armL.setPosition(.11);
-        armR.setPosition(.11);
+        armL.setPosition(.17);
+        armR.setPosition(.17);
     }
     public void armMiddle(){
         armL.setPosition(.3);
@@ -148,7 +148,7 @@ public class DepositSubsystem {
         clawTiltServo.setPosition(tiltClawPlaceSpec);
     }
     public void tiltPlace(){ clawTiltServo.setPosition(tiltClawPlace);}
-    public void tiltPlacec(){clawTiltServo.setPosition(tiltClawPlace+.18);}
+    public void tiltPlacec(){clawTiltServo.setPosition(.9);}
     public void tiltPlacespec(){clawTiltServo.setPosition(tiltClawPlace+.1);}
     public double getLiftPoz(){double averageliftPos =liftMotor1.getCurrentPosition()+liftMotor2.getCurrentPosition()/2; return averageliftPos;}
     public void updateTelemetry() {

@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsytem.DepositSubsystem;
 import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
 
 @Config
-@TeleOp(name = "1 - MT TeleOp", group = "TeleOp")
+@TeleOp(name = "1 - Worlds TeleOp", group = "TeleOp")
 public class DriveMT extends OpMode {
 
     private DepositSubsystem depositSubsystem;
@@ -137,6 +137,10 @@ public class DriveMT extends OpMode {
         if(gamepad2Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
             depositSubsystem.tiltPlaceSpec();
         }
+        else if(gamepad2Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
+            depositSubsystem.armCollect();
+            depositSubsystem.tiltPlacec();
+        }
 
         if(gamepad2Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)> .1){
             blinkinSubsystem.setPurple();
@@ -146,26 +150,10 @@ public class DriveMT extends OpMode {
             blinkinSubsystem.setGreen();
             depositSubsystem.closeClaw();
         }
+        if(gamepad2.dpad_up){
+            depositSubsystem.armPlace();
+        }
 
-        if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
- // Close claw
-            if(extension == false) {
-                depositSubsystem.armPlace();
-                arm = true;
-            }
-
-        }
-        else if(depositSubsystem.liftMotor1.getCurrentPosition()> 1000){
-            if(extension == false) {
-                depositSubsystem.tiltPlaceSpec();
-                arm = true;
-            }
-        }
-        else if(depositSubsystem.liftMotor1.getCurrentPosition()> 250 && depositSubsystem.liftMotor1.getCurrentPosition()<450){
-            depositSubsystem.armCollect();
-            depositSubsystem.tiltPlacec();
-            arm = false;
-        }
 
 
 

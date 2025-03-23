@@ -20,7 +20,7 @@ public class CollectionSubsystem {
     private DepositSubsystem depositSubsystem;
 
     public static double intakePower = 1.0;  // Full speed intake
-    public static double slowIntakePower = .75; // Reduced intake speed when detecting block
+    public static double slowIntakePower = .25; // Reduced intake speed when detecting block
 
     public final double MIN_EXTENSION = 0.765;
     public final double MAX_EXTENSION = 0.3;
@@ -96,6 +96,7 @@ public class CollectionSubsystem {
 
             case SLOWING:
                 intakeMotor.setPower(slowIntakePower);
+                tiltServo1.setPosition(TILT_UP_POSITION);
                 if (!detected) {
                     currentState = IntakeState.RETRACTING;
                 }
@@ -109,15 +110,10 @@ public class CollectionSubsystem {
                     tiltServo1.setPosition(TILT_UP_POSITION);
                     currentState = IntakeState.CLOSING_CLAW;
                 }
+                currentState = IntakeState.IDLE;
                 break;
 
-            case CLOSING_CLAW:
-                if (extensionServo1.getPosition() >= MIN_EXTENSION && tiltServo1.getPosition() == TILT_UP_POSITION && objectDetected) {
-                    depositSubsystem.closeClaw();
-                    objectDetected = false;
-                    currentState = IntakeState.IDLE;
-                }
-                break;
+
         }
 
         telemetry.addData("State", currentState);
