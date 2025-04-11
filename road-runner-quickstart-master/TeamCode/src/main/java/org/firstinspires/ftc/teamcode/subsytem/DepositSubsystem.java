@@ -12,6 +12,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 public class DepositSubsystem {
     public Servo armL, armR, clawTiltServo, clawServo;
     public DcMotor liftMotor1, liftMotor2;
+    public static boolean clawClosed = true;
     private Telemetry telemetry;
     private enum Lift {
         liftUp,
@@ -79,20 +80,20 @@ public class DepositSubsystem {
     }
 
     public void armPlace(){
-        armL.setPosition(.64);
-        armR.setPosition(.64);
+        armL.setPosition(.72);
+        armR.setPosition(.72);
     }
     public void armCollect(){
-        armL.setPosition(.17);
-        armR.setPosition(.17);
+        armL.setPosition(.145);
+        armR.setPosition(.145);
     }
     public void armMiddle(){
-        armL.setPosition(.3);
-        armR.setPosition(.3);
+        armL.setPosition(.27);
+        armR.setPosition(.27);
     }
     public void armCollectSpec() {
-        armL.setPosition(.83);
-        armR.setPosition(.83);
+        armL.setPosition(.92);
+        armR.setPosition(.92);
     }
     public void armHigh(){
         armL.setPosition(.5);
@@ -134,10 +135,12 @@ public class DepositSubsystem {
 
     public void openClaw() {
         clawServo.setPosition(.15);
+        clawClosed = false;
     }
     public void setClaw(double poz){ clawTiltServo.setPosition(poz);}
     public void closeClaw() {
         clawServo.setPosition(0);
+        clawClosed = true;
     }
     public void tiltCollectSpec(){
         clawTiltServo.setPosition(tiltClawCollectSpec);
@@ -148,7 +151,7 @@ public class DepositSubsystem {
         clawTiltServo.setPosition(tiltClawPlaceSpec);
     }
     public void tiltPlace(){ clawTiltServo.setPosition(tiltClawPlace);}
-    public void tiltPlacec(){clawTiltServo.setPosition(.9);}
+    public void tiltPlacec(){clawTiltServo.setPosition(.97);}
     public void tiltPlacespec(){clawTiltServo.setPosition(tiltClawPlace+.1);}
     public double getLiftPoz(){double averageliftPos =liftMotor1.getCurrentPosition()+liftMotor2.getCurrentPosition()/2; return averageliftPos;}
     public void updateTelemetry() {

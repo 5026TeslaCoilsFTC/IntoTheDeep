@@ -36,6 +36,8 @@ public class DriveMT extends OpMode {
     private boolean ejecting = false;
     public static String preMatchColor = "None";
     public static String mode = "Samples";
+
+    public CollectionSubsystem.IntakeState currentState = CollectionSubsystem.IntakeState.IDLE;
     @Override
     public void init() {
 
@@ -44,7 +46,8 @@ public class DriveMT extends OpMode {
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry, depositSubsystem);
-
+        collectionSubsystem.tiltServo1.setPosition(collectionSubsystem.TILT_UP_POSITION);
+        collectionSubsystem.extensionServo1.setPosition(collectionSubsystem.MIN_EXTENSION);
         gamepad1Ex = new GamepadEx(gamepad1);
         gamepad2Ex = new GamepadEx(gamepad2);
 
@@ -56,7 +59,30 @@ public class DriveMT extends OpMode {
         blinkinSubsystem.setAlternatePurpleGreen();
 
     }
+    @Override
+    public void init_loop(){
+        if (gamepad1.a) {
+            CollectionSubsystem.allianceColor = CollectionSubsystem.AllianceColor.BLUE;
+        }
+        if (gamepad1.b) {
+            CollectionSubsystem.allianceColor = CollectionSubsystem.AllianceColor.RED;
+        }
+        if (gamepad1.x) {
+            CollectionSubsystem.allianceColor = CollectionSubsystem.AllianceColor.BOTH;
+        }
 
+        telemetry.addData("Alliance Color", CollectionSubsystem.allianceColor);
+        telemetry.update();
+
+    }
+    public void start(){
+        collectionSubsystem.tiltServo1.setPosition(collectionSubsystem.TILT_UP_POSITION);
+        collectionSubsystem.extensionServo1.setPosition(collectionSubsystem.MIN_EXTENSION);
+        depositSubsystem.armCollect();
+        depositSubsystem.tiltPlacec();
+        depositSubsystem.openClaw();
+
+    }
     @Override
     public void loop() {
         if (gamepad1Ex.getButton(GamepadKeys.Button.B)) {
@@ -80,7 +106,16 @@ public class DriveMT extends OpMode {
         if(gamepad1Ex.getButton(GamepadKeys.Button.X)){
             speed = 1;
         }
+        if(gamepad1Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
+            collectionSubsystem.reverseIntake();
 
+        }
+        else if (gamepad1Ex.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)> .1){
+            collectionSubsystem.tiltServo1.setPosition(collectionSubsystem.TILT_DOWN_POSITION);
+        }
+        if(gamepad1Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)>.1){
+            collectionSubsystem.resetState();
+        }
         // === Drive Controls ===
         double drive = gamepad1Ex.getLeftY(); // Forward/Backward
         double strafe = gamepad1Ex.getLeftX(); // Left/Right
@@ -137,10 +172,6 @@ public class DriveMT extends OpMode {
         if(gamepad2Ex.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
             depositSubsystem.tiltPlaceSpec();
         }
-        else if(gamepad2Ex.getButton(GamepadKeys.Button.LEFT_BUMPER)){
-            depositSubsystem.armCollect();
-            depositSubsystem.tiltPlacec();
-        }
 
         if(gamepad2Ex.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)> .1){
             blinkinSubsystem.setPurple();
@@ -150,10 +181,26 @@ public class DriveMT extends OpMode {
             blinkinSubsystem.setGreen();
             depositSubsystem.closeClaw();
         }
-        if(gamepad2.dpad_up){
-            depositSubsystem.armPlace();
-        }
 
+        if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<750){
+ // Close claw
+            if(extension == false) {
+                depositSubsystem.armPlace();
+                arm = true;
+            }
+
+        }
+        else if(depositSubsystem.liftMotor1.getCurrentPosition()> 1000){
+            if(extension == false) {
+                depositSubsystem.tiltPlaceSpec();
+                arm = true;
+            }
+        }
+        else if(depositSubsystem.liftMotor1.getCurrentPosition()> 250 && depositSubsystem.liftMotor1.getCurrentPosition()<450){
+            depositSubsystem.armCollect();
+            depositSubsystem.tiltPlacec();
+            arm = false;
+        }
 
 
 
@@ -170,6 +217,6 @@ public class DriveMT extends OpMode {
         );
 
         telemetry.update();
-
+        telemetry.addData("Extentsion Pos: ", collectionSubsystem.extensionServo1.getPosition());
     }
 }

@@ -26,8 +26,8 @@ public class servoSet extends LinearOpMode {
 
 //        L1  = hardwareMap.get(Servo.class, "LIntake");
 //        L2  = hardwareMap.get(Servo.class, "RIntake");
-        tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
-        tiltServo2 = hardwareMap.get(Servo.class, "tiltServo2");
+        tiltServo1 = hardwareMap.get(Servo.class, "armL");
+        tiltServo2 = hardwareMap.get(Servo.class, "armR");
         tiltServo1.setDirection(Servo.Direction.REVERSE);
 //        wristL = hardwareMap.get(Servo.class, "wristL");
 //        wristR = hardwareMap.get(Servo.class, "wristR");

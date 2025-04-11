@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "Set Extension Servos to 0", group = "TeleOp")
 public class setExtensionServo extends OpMode {
 
-    private CRServo  extensionServo1, extensionServo2;
+    private Servo  extensionServo1, extensionServo2;
 
     @Override
     public void init() {
@@ -16,7 +16,7 @@ public class setExtensionServo extends OpMode {
 
         // Initialize the extension servos
         try {
-            extensionServo1 = hardwareMap.get(CRServo.class, "extensionServo1");
+            extensionServo1 = hardwareMap.get(Servo.class, "extensionServo1");
             //extensionServo2 = hardwareMap.get(CRServo.class, "extensionServo2");
             telemetry.addData("Servo Initialization", "Servos found and initialized");
         } catch (Exception e) {

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class setaArmTo5 extends OpMode {
 
     private Servo  armL, armR;
-    public static double armPos = .15;
+    public static double armPos = 0.5;
     public static double tiltPos = .3;
     public static double wristPos = .79;
     public Servo tiltServo1, clawServo;
@@ -48,8 +48,8 @@ public class setaArmTo5 extends OpMode {
         telemetry.addData("Status", "Extension servos are at 0");
         armL.setPosition(armPos);
         armR.setPosition(armPos);
-        tiltServo1.setPosition(tiltPos);
-        clawServo.setPosition(wristPos);
+//        tiltServo1.setPosition(tiltPos);
+//        clawServo.setPosition(wristPos);
         telemetry.update();
     }
 }
