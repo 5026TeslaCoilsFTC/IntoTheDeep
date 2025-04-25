@@ -43,6 +43,7 @@ public class colorClassifierTestOpMode extends LinearOpMode {
             telemetry.addData("Raw RGB", "%d / %d / %d", rawRed, rawGreen, rawBlue);
             telemetry.addData("Norm RGB", "%.2f / %.2f / %.2f", normRed, normGreen, normBlue);
             telemetry.addData("Detected Color", detectedColor);
+            telemetry.addData("Aplpha ", colorSensor.alpha());
             telemetry.update();
 
             // --- FTC Dashboard Telemetry ---
@@ -54,6 +55,7 @@ public class colorClassifierTestOpMode extends LinearOpMode {
             packet.put("Norm Green", normGreen);
             packet.put("Norm Blue", normBlue);
             packet.put("Detected Color", detectedColor.toString());
+            packet.put("Alpha ", colorSensor.alpha());
             dashboard.sendTelemetryPacket(packet);
 
             sleep(50); // Update rate

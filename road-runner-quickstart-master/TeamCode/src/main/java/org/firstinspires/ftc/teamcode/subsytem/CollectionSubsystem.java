@@ -22,12 +22,13 @@ public class CollectionSubsystem {
     private DepositSubsystem depositSubsystem;
     private final colorClassifierTest colorClassifier;
     public static double intakePower = 1.0;  // Full speed intake
-    public static double slowIntakePower = .3; // Reduced intake speed when detecting block
+    public static double slowIntakePower = .45
+            ; // Reduced intake speed when detecting block
 
     public final double MIN_EXTENSION = .38;
     public final double MAX_EXTENSION = 0;
 
-    public final double TILT_UP_POSITION = .31;
+    public final double TILT_UP_POSITION = .43;
     public final double TILT_DOWN_POSITION = .53;
     public static boolean clawClosed = false;
     private ElapsedTime clawDelayTimer = new ElapsedTime();

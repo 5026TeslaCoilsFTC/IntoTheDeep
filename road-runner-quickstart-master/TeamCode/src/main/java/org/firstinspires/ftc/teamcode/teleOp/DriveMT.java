@@ -46,8 +46,7 @@ public class DriveMT extends OpMode {
         depositSubsystem = new DepositSubsystem(hardwareMap, telemetry);
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry);
         collectionSubsystem = new CollectionSubsystem(hardwareMap, telemetry, depositSubsystem);
-        collectionSubsystem.tiltServo1.setPosition(collectionSubsystem.TILT_UP_POSITION);
-        collectionSubsystem.extensionServo1.setPosition(collectionSubsystem.MIN_EXTENSION);
+
         gamepad1Ex = new GamepadEx(gamepad1);
         gamepad2Ex = new GamepadEx(gamepad2);
 
@@ -64,6 +63,7 @@ public class DriveMT extends OpMode {
         if (gamepad1.a) {
             CollectionSubsystem.allianceColor = CollectionSubsystem.AllianceColor.BLUE;
         }
+
         if (gamepad1.b) {
             CollectionSubsystem.allianceColor = CollectionSubsystem.AllianceColor.RED;
         }
@@ -76,7 +76,7 @@ public class DriveMT extends OpMode {
 
     }
     public void start(){
-        collectionSubsystem.tiltServo1.setPosition(collectionSubsystem.TILT_UP_POSITION);
+        collectionSubsystem.tiltServo1.setPosition(.3);
         collectionSubsystem.extensionServo1.setPosition(collectionSubsystem.MIN_EXTENSION);
         depositSubsystem.armCollect();
         depositSubsystem.tiltPlacec();

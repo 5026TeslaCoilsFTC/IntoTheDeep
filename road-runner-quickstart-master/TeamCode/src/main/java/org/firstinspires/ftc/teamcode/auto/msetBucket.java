@@ -29,8 +29,8 @@ import org.firstinspires.ftc.teamcode.subsytem.DriveSubsystem;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "4 Bucket PP", group = "Examples")
-public class bucket3 extends OpMode {
+@Autonomous(name = " MSET Bucket", group = "Examples")
+public class msetBucket extends OpMode {
     private DepositSubsystem depositSubsystem;
     private DriveSubsystem driveSubsystem;
     private CollectionSubsystem collectionSubsystem;
@@ -57,7 +57,7 @@ public class bucket3 extends OpMode {
     private final Pose startPose = new Pose(9, 111, Math.toRadians(270));
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-    private final Pose scorePose = new Pose(17, 123, Math.toRadians(315));
+    private final Pose scorePose = new Pose(17, 122.5, Math.toRadians(315));
 
     /** Lowest (First) Sample from the Spike Mark */
     private final Pose pickup1Pose = new Pose(26, 117.25, Math.toRadians(0));
@@ -219,8 +219,8 @@ public class bucket3 extends OpMode {
                     actionIsReset = true;
                 }
                 if (action.seconds()> 2&& !scored&& !follower.isBusy()){
-                score(1);
-            }
+                    score(1);
+                }
                 CollectionSubsystem.clawClosed = false;
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()&& scored) {
@@ -358,11 +358,11 @@ public class bucket3 extends OpMode {
     public void loop() {
         if(depositSubsystem.liftMotor1.getCurrentPosition()>500 && depositSubsystem.liftMotor1.getCurrentPosition()<2500){
             // Close claw
-                depositSubsystem.armPlace();
+            depositSubsystem.armPlace();
         }
         else if(depositSubsystem.liftMotor1.getCurrentPosition()> 2600){
 
-                depositSubsystem.tiltPlaceSpec();
+            depositSubsystem.tiltPlaceSpec();
 
 
         }

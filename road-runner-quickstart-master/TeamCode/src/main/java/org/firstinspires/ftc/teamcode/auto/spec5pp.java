@@ -137,7 +137,7 @@ public class spec5pp extends OpMode {
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(15,18),new Point(30, 65)))
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
-                .addParametricCallback(.75, ()->depositSubsystem.armPlace())
+                .addParametricCallback(.5, ()->depositSubsystem.armPlace())
                 .addPath(new BezierLine(new Point(30,65), new Point(scorePose)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .addParametricCallback(.25, ()->depositSubsystem.openClaw())
@@ -154,7 +154,7 @@ public class spec5pp extends OpMode {
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(new BezierCurve(new Point(15,18),new Point(30, 65)))
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
-                .addParametricCallback(.75, ()->depositSubsystem.armPlace())
+                .addParametricCallback(.5, ()->depositSubsystem.armPlace())
                 .addPath(new BezierLine(new Point(30,65), new Point(scorePose)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .addParametricCallback(.25, ()->depositSubsystem.openClaw())
@@ -171,7 +171,7 @@ public class spec5pp extends OpMode {
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(new BezierCurve(new Point(15,18),new Point(30, 65)))
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                .addParametricCallback(.75, ()->depositSubsystem.armPlace())
+                .addParametricCallback(.5, ()->depositSubsystem.armPlace())
                 .addPath(new BezierLine(new Point(30,65), new Point(scorePose)))
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addParametricCallback(.25, ()->depositSubsystem.openClaw())
@@ -218,6 +218,7 @@ public class spec5pp extends OpMode {
         switch (pathState) {
             case 0:
                 if(!follower.isBusy()&& !pathIsRun) {
+                    waitMilliseconds(1000);
                     follower.followPath(scorePreload);
                     pathIsRun = true;
                 }

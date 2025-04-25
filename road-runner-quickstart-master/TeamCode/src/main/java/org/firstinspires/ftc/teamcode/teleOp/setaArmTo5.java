@@ -13,7 +13,8 @@ public class setaArmTo5 extends OpMode {
     public static double armPos = 0.5;
     public static double tiltPos = .3;
     public static double wristPos = .79;
-    public Servo tiltServo1, clawServo;
+    public static double clawPose = 0;
+    public Servo tiltServo1, clawServo, clawTiltServo;
     @Override
     public void init() {
         telemetry.addData("Status", "Initializing...");
@@ -24,7 +25,8 @@ public class setaArmTo5 extends OpMode {
             armR = hardwareMap.get(Servo.class, "armR");
             tiltServo1 = hardwareMap.get(Servo.class, "tiltServo1");
             tiltServo1.setDirection(Servo.Direction.REVERSE);
-            clawServo = hardwareMap.get(Servo.class, "clawServo");
+            clawServo = hardwareMap.get(Servo.class, "clawTiltServo");
+            clawTiltServo = hardwareMap.get(Servo.class,"clawServo");
           armL.setDirection(Servo.Direction.REVERSE);
             //extensionServo2 = hardwareMap.get(CRServo.class, "extensionServo2");
             telemetry.addData("Servo Initialization", "Servos found and initialized");
@@ -48,8 +50,9 @@ public class setaArmTo5 extends OpMode {
         telemetry.addData("Status", "Extension servos are at 0");
         armL.setPosition(armPos);
         armR.setPosition(armPos);
-//        tiltServo1.setPosition(tiltPos);
-//        clawServo.setPosition(wristPos);
+        tiltServo1.setPosition(tiltPos);
+        clawServo.setPosition(wristPos);
+        clawTiltServo.setPosition(clawPose);
         telemetry.update();
     }
 }
